@@ -1,0 +1,68 @@
+<div class="dashboard-wrapper">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <h1>📊 Dashboard de Efectividad</h1>
+    <span class="live-badge" *ngIf="!loading">🟢 En vivo</span>
+    <span class="live-badge loading" *ngIf="loading">⏳ Actualizando...</span>
+  </div>
+
+  <!-- MÉTRICAS -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-value">{{ metrics.total ?? 0 }}</div>
+      <div class="metric-label">Total actividades</div>
+    </div>
+    <div class="metric-card open">
+      <div class="metric-value">{{ metrics.open ?? 0 }}</div>
+      <div class="metric-label">🟢 En proceso</div>
+    </div>
+    <div class="metric-card closed">
+      <div class="metric-value">{{ metrics.closed ?? 0 }}</div>
+      <div class="metric-label">✅ Finalizadas</div>
+    </div>
+    <div class="metric-card quantity">
+      <div class="metric-value">{{ metrics.total_quantity ?? 0 }}</div>
+      <div class="metric-label">📦 Unidades producidas</div>
+    </div>
+    <div class="metric-card duration">
+      <div class="metric-value">{{ (metrics.avg_duration_minutes ?? 0) | number:'1.0-0' }} min</div>
+      <div class="metric-label">⏱ Duración promedio</div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters-section">
+    <app-efectividad-filters
+      [operators]="operators"
+      [processes]="processes"
+      (onFilter)="onFilter.emit($event)">
+    </app-efectividad-filters>
+  </div>
+
+  <!-- TABLA + RESUMEN: Layout en dos columnas controlado -->
+  <div class="content-grid">
+    
+    <!-- Tabla: Ocupa el espacio principal -->
+    <div class="table-section">
+      <div class="section-header">
+        <h3>📋 Registro de Actividades</h3>
+      </div>
+      <div class="table-container">
+        <app-efectividad-table [activities]="activities"></app-efectividad-table>
+      </div>
+    </div>
+
+    <!-- Resumen: Columna lateral fija -->
+    <div class="summary-section">
+      <div class="section-header">
+        <h3>📈 Resumen de Efectividad</h3>
+      </div>
+      <div class="summary-container">
+        <app-efectividad-summary [effectiveness]="effectiveness"></app-efectividad-summary>
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,31 @@
+<div class="filters-bar">
+
+  <div class="filter-group">
+    <label>📅 Desde</label>
+    <input type="date" [(ngModel)]="filters.date_from" (change)="emit()" />
+  </div>
+
+  <div class="filter-group">
+    <label>📅 Hasta</label>
+    <input type="date" [(ngModel)]="filters.date_to" (change)="emit()" />
+  </div>
+
+  <div class="filter-group">
+    <label>👤 Operador</label>
+    <select [(ngModel)]="filters.operator_id" (change)="emit()">
+      <option [ngValue]="null">Todos</option>
+      <option *ngFor="let op of operators" [ngValue]="op.id">{{ op.name }}</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label>⚙️ Proceso</label>
+    <select [(ngModel)]="filters.process_id" (change)="emit()">
+      <option [ngValue]="null">Todos</option>
+      <option *ngFor="let pr of processes" [ngValue]="pr.id">{{ pr.name }}</option>
+    </select>
+  </div>
+
+  <button class="btn-clear" (click)="clear()">✖ Limpiar</button>
+
+</div>

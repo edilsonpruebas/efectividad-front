@@ -1,0 +1,51 @@
+<div class="app-shell" [class.collapsed]="!sidebarOpen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-header">
+      <span class="logo" *ngIf="sidebarOpen">⚙️ Módulo Prueba</span>
+      <button class="toggle-btn" (click)="toggle()">
+        {{ sidebarOpen ? '◀' : '▶' }}
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <div class="nav-section">
+        <span class="nav-section-label" *ngIf="sidebarOpen">Operaciones</span>
+
+        <a routerLink="/"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }"
+           class="nav-item">
+          <span class="nav-icon">🏭</span>
+          <span class="nav-label" *ngIf="sidebarOpen">Dashboard Actividades</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-section-label" *ngIf="sidebarOpen">Reportes</span>
+
+        <a routerLink="/reports/efectividad"
+           routerLinkActive="active"
+           class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label" *ngIf="sidebarOpen">Efectividad</span>
+        </a>
+      </div>
+
+    </nav>
+
+    <div class="sidebar-footer" *ngIf="sidebarOpen">
+      <span>v1.0.0</span>
+    </div>
+
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+    <router-outlet />
+  </main>
+
+</div>

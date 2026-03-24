@@ -1,0 +1,85 @@
+<div class="dashboard">
+
+  <!-- PANEL IZQUIERDO -->
+  <div class="panel start-panel">
+    <div class="panel-header">
+      <h2>🚀 Iniciar Actividad</h2>
+      <p class="panel-subtitle">Registra una nueva tarea de producción</p>
+    </div>
+
+    <div class="form-group">
+      <label>👤 Operador</label>
+      <select [(ngModel)]="form.operator_id">
+        <option [ngValue]="null" disabled selected>Seleccionar operador...</option>
+        <option *ngFor="let op of operators" [value]="op.id">
+          {{op.name}}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>⚙️ Proceso</label>
+      <select [(ngModel)]="form.process_id">
+        <option [ngValue]="null" disabled selected>Seleccionar proceso...</option>
+        <option *ngFor="let pr of processes" [value]="pr.id">
+          {{pr.name}}
+        </option>
+      </select>
+    </div>
+
+    <button (click)="start()" class="btn btn-start">
+      <span class="btn-icon">▶</span>
+      <span>Iniciar Producción</span>
+    </button>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="panel list-panel">
+    <div class="panel-header">
+      <h2>📋 Actividades en Proceso</h2>
+      <span class="badge-count" *ngIf="activities.length > 0">
+        {{activities.length}} activas
+      </span>
+    </div>
+
+    <div class="empty-state" *ngIf="activities.length === 0">
+      <div class="empty-icon">⏳</div>
+      <p>No hay actividades en proceso</p>
+      <span>Inicia una nueva actividad desde el panel izquierdo</span>
+    </div>
+
+    <div *ngFor="let act of activities; let i = index" class="card" [style.animation-delay]="i * 0.1 + 's'">
+      
+      <div class="card-info">
+        <div class="name">{{act.operator.name}}</div>
+        <div class="process">
+          <span class="process-dot"></span>
+          {{act.process.name}}
+        </div>
+        <div class="time">
+          <span class="time-icon">🕐</span>
+          {{act.start_time | date:'shortTime'}} - 
+          <span class="duration">En curso</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <div class="input-group">
+          <label class="input-label">Cantidad</label>
+          <input type="number"
+                 [(ngModel)]="quantities[act.id]"
+                 placeholder="0"
+                 min="0">
+        </div>
+
+        <button (click)="stop(act)" class="btn btn-stop">
+          <span class="btn-icon">✔</span>
+          <span>Finalizar</span>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

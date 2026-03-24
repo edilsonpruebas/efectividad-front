@@ -1,0 +1,187 @@
+/* ===== TABLE WRAPPER ===== */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+/* ===== BASE TABLE STYLES ===== */
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  text-align: left;
+  background: #ffffff;
+}
+
+/* ===== HEADER STYLES ===== */
+.table-wrapper thead {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #ffffff;
+}
+
+.table-wrapper th {
+  padding: 10px 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #475569;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table-wrapper th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.table-wrapper th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* ===== BODY STYLES ===== */
+.table-wrapper tbody tr {
+  transition: background-color 0.15s ease;
+  height: 36px;
+}
+
+.table-wrapper tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.table-wrapper td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #374151;
+  vertical-align: middle;
+  line-height: 1.3;
+}
+
+/* Zebra striping */
+.table-wrapper tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.table-wrapper tbody tr:nth-child(even):hover {
+  background-color: #f1f5f9;
+}
+
+/* ===== LAST ROW (Empty State) ===== */
+.table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-wrapper tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.table-wrapper tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* ===== EMPTY STATE ===== */
+.table-wrapper .empty {
+  text-align: center;
+  padding: 24px 12px;
+  color: #9ca3af;
+  font-style: italic;
+  background: #f9fafb;
+  font-size: 12px;
+}
+
+/* ===== BADGE/STATUS STYLES ===== */
+.table-wrapper .badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+/* Estados */
+.badge-completed,
+.badge-finalizado,
+.badge-done {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.badge-pending,
+.badge-pendiente,
+.badge-waiting {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.badge-in-progress,
+.badge-proceso,
+.badge-active {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.badge-cancelled,
+.badge-cancelado,
+.badge-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .table-wrapper {
+    border-radius: 6px;
+  }
+  
+  .table-wrapper th,
+  .table-wrapper td {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-wrapper th,
+  .table-wrapper td {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  
+  .table-wrapper .badge {
+    padding: 2px 6px;
+    font-size: 8px;
+  }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

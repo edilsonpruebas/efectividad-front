@@ -1,0 +1,11 @@
+<div>
+  <h3>Actividades Abiertas</h3>
+
+  <div *ngFor="let act of activities">
+    <p>
+      {{act.operator.name}} - {{act.process.name}} - {{act.start_time}}
+    </p>
+
+    <button (click)="stop(act)">Finalizar</button>
+  </div>
+</div>

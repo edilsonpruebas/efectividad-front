@@ -1,0 +1,35 @@
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Operador</th>
+        <th>Proceso</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Duración (min)</th>
+        <th>Cantidad</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let act of activities">
+        <td>{{ act.id }}</td>
+        <td>{{ act.operator?.name ?? '—' }}</td>
+        <td>{{ act.process?.name ?? '—' }}</td>
+        <td>{{ act.start_time | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ act.end_time ? (act.end_time | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+        <td>{{ act.duration_minutes ?? '—' }}</td>
+        <td>{{ act.quantity ?? '—' }}</td>
+        <td>
+          <span class="badge" [ngClass]="statusClass(act.status)">
+            {{ statusLabel(act.status) }}
+          </span>
+        </td>
+      </tr>
+      <tr *ngIf="activities.length === 0">
+        <td colspan="8" class="empty">No hay registros para los filtros aplicados.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

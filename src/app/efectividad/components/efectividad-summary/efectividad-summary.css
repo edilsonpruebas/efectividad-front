@@ -1,0 +1,226 @@
+summary-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 280px;
+  max-width: 320px;
+}
+
+.summary-section {}
+
+.summary-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 12px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.summary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.summary-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.summary-card-body {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* BADGES */
+.badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badge-high    { background: #dcfce7; color: #16a34a; }
+.badge-mid     { background: #fef9c3; color: #ca8a04; }
+.badge-low     { background: #fee2e2; color: #dc2626; }
+.badge-neutral { background: #f1f5f9; color: #94a3b8; }
+
+/* BARRA DE PROGRESO */
+.progress-bar-wrapper {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.progress-bar.badge-high { background: #22c55e; }
+.progress-bar.badge-mid  { background: #eab308; }
+.progress-bar.badge-low  { background: #ef4444; }
+
+.empty {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 16px 0;
+}
+
+/* ===================== TABLA OPERADORES ===================== */
+
+.operator-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.operator-table th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 10px;
+  text-align: center;
+}
+
+.operator-table td {
+  padding: 10px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.operator-table tr:hover {
+  background: #f9fafb;
+}
+
+/* ALIGN */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+/* BOTÓN EXPANDIR */
+.btn-expand {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: none;
+  background: #e2e8f0;
+  cursor: pointer;
+  font-weight: bold;
+  color: #334155;
+  transition: 0.2s;
+}
+
+.btn-expand:hover {
+  background: #cbd5f5;
+}
+
+/* FILA DETALLE */
+.detail-row {
+  background: #f8fafc;
+}
+
+.detail-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ACTIVIDADES */
+.activities-box {
+  flex: 2;
+}
+
+.activities-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.activities-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activities-table th {
+  font-size: 0.65rem;
+  background: #f1f5f9;
+  padding: 6px;
+  text-align: center;
+}
+
+.activities-table td {
+  font-size: 0.75rem;
+  padding: 6px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* RESUMEN */
+.summary-box {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.summary-box .row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+}
+
+/* EFECTIVIDAD INLINE */
+.effectiveness-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress-bar-wrapper.small {
+  width: 80px;
+}

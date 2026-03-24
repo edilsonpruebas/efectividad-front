@@ -1,0 +1,35 @@
+<div class="history-panel">
+
+  <h2>Historial de Actividades <span class="subtitle">— últimos 10 registros</span></h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Operador</th>
+        <th>Proceso</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Duración (min)</th>
+        <th>Cantidad</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let h of history">
+        <td>{{ h.operator }}</td>
+        <td>{{ h.process }}</td>
+        <td>{{ h.start_time | date:'short' }}</td>
+        <td>{{ h.end_time | date:'short' }}</td>
+        <td>{{ h.duration_minutes }}</td>
+        <td>{{ h.quantity ?? '—' }}</td>
+      </tr>
+
+      <tr *ngIf="history.length === 0">
+        <td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">
+          No hay registros aún.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
