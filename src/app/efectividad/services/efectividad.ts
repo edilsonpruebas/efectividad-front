@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, interval, switchMap, startWith, takeUntil, Subject } from 'rxjs';
+import {
+  BehaviorSubject, Subject, switchMap, takeUntil, tap, catchError, of
+} from 'rxjs';
 
 export interface EfectividadFilter {
   date_from:   string | null;
@@ -22,13 +24,11 @@ export class EfectividadService {
     process_id:  null
   });
 
-  // 🔥 IMPORTANTE: ahora incluye effectiveness
-  private dataSubject = new BehaviorSubject<any>({
-    activities: [],
-    metrics: {},
+  private dataSubject    = new BehaviorSubject<any>({
+    activities:    [],
+    metrics:       {},
     effectiveness: { by_operator: [], by_process: [] }
   });
-
   private loadingSubject = new BehaviorSubject<boolean>(false);
   private destroy$       = new Subject<void>();
 
@@ -37,92 +37,44 @@ export class EfectividadService {
 
   constructor(private http: HttpClient) {}
 
-  // 🔥 FUNCIÓN CLAVE (NO TOCA TU CÁLCULO, SOLO AGREGA ACTIVIDADES)
-  private attachActivities(effectiveness: any, activities: any[]) {
-
-    const map: any = {};
-
-    activities.forEach(act => {
-      const opName =
-        act.operator?.name ||
-        act.operator_name ||
-        act.user?.name ||
-        'Sin nombre';
-
-      if (!map[opName]) {
-        map[opName] = [];
-      }
-
-      const standard = act.standard || act.expected || 0;
-      const real     = act.real || act.produced || 0;
-
-      map[opName].push({
-        name: act.process?.name || act.activity_name || 'Actividad',
-        time: act.time_spent || act.duration || '—',
-        standard,
-        real,
-        effectiveness: standard
-          ? Math.round((real / standard) * 100)
-          : 0
-      });
-    });
-
-    if (effectiveness?.by_operator) {
-      effectiveness.by_operator.forEach((op: any) => {
-        op.activities = map[op.name] || [];
-      });
-    }
-
-    return effectiveness;
-  }
-
   startPolling() {
     this.destroy$ = new Subject<void>();
 
-    interval(this.POLL_MS)
+    // ✅ FIX #1: filters$ como fuente — reacciona a cada cambio de filtro
+    this.filters$
       .pipe(
-        startWith(0),
-        switchMap(() => {
-          this.loadingSubject.next(true);
-
-          const f    = this.filters$.value;
+        tap(() => this.loadingSubject.next(true)),
+        switchMap(f => {
           let params = new HttpParams();
-
           if (f.date_from)   params = params.set('date_from',   f.date_from);
           if (f.date_to)     params = params.set('date_to',     f.date_to);
-          if (f.operator_id) params = params.set('operator_id', f.operator_id);
-          if (f.process_id)  params = params.set('process_id',  f.process_id);
+          if (f.operator_id) params = params.set('operator_id', String(f.operator_id));
+          if (f.process_id)  params = params.set('process_id',  String(f.process_id));
 
-          return this.http.get<any>(this.api, { params });
+          return this.http.get<any>(this.api, { params }).pipe(
+            catchError(err => {
+              console.error('Error dashboard:', err);
+              return of(null);
+            })
+          );
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe({
-        next: data => {
+      .subscribe(data => {
+        this.loadingSubject.next(false);
+        if (!data) return;
 
-          let effectiveness = data.effectiveness;
-
-          // 🔥 SOLO ENRIQUECE, NO RECALCULA
-          if (effectiveness?.by_operator) {
-            effectiveness = this.attachActivities(effectiveness, data.activities || []);
-          }
-
-          this.dataSubject.next({
-            ...data,
-            effectiveness
-          });
-
-          this.loadingSubject.next(false);
-        },
-        error: err => {
-          console.error('Error dashboard:', err);
-          this.loadingSubject.next(false);
-        }
+        // ✅ FIX #2: NO tocar effectiveness — viene calculado correctamente del backend
+        this.dataSubject.next({
+          activities:    data.activities    ?? [],
+          metrics:       data.metrics       ?? {},
+          effectiveness: data.effectiveness ?? { by_operator: [], by_process: [] }
+        });
       });
   }
 
   setFilters(filters: EfectividadFilter) {
-    this.filters$.next(filters);
+    this.filters$.next(filters); // ✅ esto ahora dispara el switchMap automáticamente
   }
 
   stopPolling() {

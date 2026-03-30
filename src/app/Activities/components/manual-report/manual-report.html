@@ -1,0 +1,61 @@
+<div class="report-wrapper">
+
+  <div class="report-header">
+    <h2>📝 Reporte Manual de Actividad</h2>
+    <p>Registra una actividad que ya fue completada</p>
+  </div>
+
+  <div class="alert alert-success" *ngIf="success">
+    ✅ Reporte registrado correctamente.
+  </div>
+
+  <div class="alert alert-error" *ngIf="error">
+    ⚠️ {{ error }}
+  </div>
+
+  <div class="report-form">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>👤 Operador responsable</label>
+        <select [(ngModel)]="form.operator_id">
+          <option [ngValue]="null" disabled selected>Seleccionar operador...</option>
+          <option *ngFor="let op of operators" [value]="op.id">{{ op.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>⚙️ Proceso</label>
+        <select [(ngModel)]="form.process_id">
+          <option [ngValue]="null" disabled selected>Seleccionar proceso...</option>
+          <option *ngFor="let pr of processes" [value]="pr.id">{{ pr.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>🕐 Hora de inicio</label>
+        <input type="datetime-local" [(ngModel)]="form.start_time">
+      </div>
+
+      <div class="form-group">
+        <label>🕑 Hora de finalización</label>
+        <input type="datetime-local" [(ngModel)]="form.end_time">
+      </div>
+    </div>
+
+    <div class="form-row single">
+      <div class="form-group">
+        <label>📦 Cantidad producida</label>
+        <input type="number" [(ngModel)]="form.quantity" placeholder="0" min="0">
+      </div>
+    </div>
+
+    <button (click)="submit()" class="btn-submit" [disabled]="loading">
+      <span *ngIf="!loading">💾 Registrar Reporte</span>
+      <span *ngIf="loading">⏳ Guardando...</span>
+    </button>
+
+  </div>
+</div>

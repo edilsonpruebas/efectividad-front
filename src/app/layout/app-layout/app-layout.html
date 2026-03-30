@@ -35,6 +35,13 @@
         </a>
       </div>
 
+      <a routerLink="/reports/manual"
+     routerLinkActive="active"
+     class="nav-item">
+    <span class="nav-icon">📝</span>
+    <span class="nav-label" *ngIf="sidebarOpen">Reporte Manual</span>
+  </a>
+
     </nav>
 
     <div class="sidebar-footer" *ngIf="sidebarOpen">

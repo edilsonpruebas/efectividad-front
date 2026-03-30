@@ -27,7 +27,7 @@
     </div>
     <div class="metric-card duration">
       <div class="metric-value">{{ (metrics.avg_duration_minutes ?? 0) | number:'1.0-0' }} min</div>
-      <div class="metric-label">⏱ Duración promedio</div>
+      <div class="metric-label">⏱ Duración total</div>
     </div>
   </div>
 
@@ -40,26 +40,38 @@
     </app-efectividad-filters>
   </div>
 
-  <!-- TABLA + RESUMEN: Layout en dos columnas controlado -->
-  <div class="content-grid">
-    
-    <!-- Tabla: Ocupa el espacio principal -->
-    <div class="table-section">
+  <!-- TABLA DE ACTIVIDADES (fila completa) -->
+  <div class="table-section">
+    <div class="section-header">
+      <h3>📋 Registro de Actividades</h3>
+    </div>
+    <div class="table-container">
+      <app-efectividad-table [activities]="activities"></app-efectividad-table>
+    </div>
+  </div>
+
+  <!-- RESUMEN OPERADORES + RESUMEN PROCESOS (lado a lado) -->
+  <div class="summary-grid">
+
+    <div class="summary-section">
       <div class="section-header">
-        <h3>📋 Registro de Actividades</h3>
+        <h3>👤 Resumen de Efectividad por Operador</h3>
       </div>
-      <div class="table-container">
-        <app-efectividad-table [activities]="activities"></app-efectividad-table>
+      <div class="summary-container">
+        <app-efectividad-summary
+          [effectiveness]="{ by_operator: effectiveness.by_operator, by_process: [] }">
+        </app-efectividad-summary>
       </div>
     </div>
 
-    <!-- Resumen: Columna lateral fija -->
     <div class="summary-section">
       <div class="section-header">
-        <h3>📈 Resumen de Efectividad</h3>
+        <h3>⚙️ Resumen de Efectividad por Proceso</h3>
       </div>
       <div class="summary-container">
-        <app-efectividad-summary [effectiveness]="effectiveness"></app-efectividad-summary>
+        <app-efectividad-summary
+          [effectiveness]="{ by_operator: [], by_process: effectiveness.by_process }">
+        </app-efectividad-summary>
       </div>
     </div>
 

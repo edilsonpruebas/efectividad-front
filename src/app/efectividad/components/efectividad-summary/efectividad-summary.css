@@ -1,12 +1,15 @@
-summary-wrapper {
+.summary-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  min-width: 280px;
-  max-width: 320px;
+  gap: 16px;
+  width: 100%;           /* ocupa el ancho disponible, sin límite de 320px */
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin-bottom: 24px;   /* espacio visible entre los dos cuadros */
+  box-sizing: border-box;
 }
-
-.summary-section {}
 
 .summary-title {
   font-size: 0.85rem;
@@ -64,7 +67,6 @@ summary-wrapper {
   color: #1e293b;
 }
 
-/* BADGES */
 .badge {
   padding: 3px 10px;
   border-radius: 999px;
@@ -77,7 +79,6 @@ summary-wrapper {
 .badge-low     { background: #fee2e2; color: #dc2626; }
 .badge-neutral { background: #f1f5f9; color: #94a3b8; }
 
-/* BARRA DE PROGRESO */
 .progress-bar-wrapper {
   height: 6px;
   background: #f1f5f9;
@@ -134,12 +135,10 @@ summary-wrapper {
   background: #f9fafb;
 }
 
-/* ALIGN */
 .text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-left { text-align: left; }
+.text-right  { text-align: right; }
+.text-left   { text-align: left; }
 
-/* BOTÓN EXPANDIR */
 .btn-expand {
   width: 26px;
   height: 26px;
@@ -156,7 +155,6 @@ summary-wrapper {
   background: #cbd5f5;
 }
 
-/* FILA DETALLE */
 .detail-row {
   background: #f8fafc;
 }
@@ -167,7 +165,6 @@ summary-wrapper {
   flex-wrap: wrap;
 }
 
-/* ACTIVIDADES */
 .activities-box {
   flex: 2;
 }
@@ -197,7 +194,6 @@ summary-wrapper {
   border-bottom: 1px solid #e2e8f0;
 }
 
-/* RESUMEN */
 .summary-box {
   flex: 1;
   background: #ffffff;
@@ -213,7 +209,6 @@ summary-wrapper {
   margin-bottom: 6px;
 }
 
-/* EFECTIVIDAD INLINE */
 .effectiveness-cell {
   display: flex;
   flex-direction: column;

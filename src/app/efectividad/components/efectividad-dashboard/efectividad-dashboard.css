@@ -323,6 +323,28 @@
   border-radius: 2px;
 }
 
+/* ===== RESUMEN LADO A LADO ===== */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.summary-grid .summary-section {
+  position: static;        /* anula el sticky del summary-section global */
+  max-height: none;        /* anula el max-height del summary-section global */
+  min-width: 0;            /* evita overflow en grid, anula el min-width fijo */
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ===== SECCIÓN DE RESUMEN - AHORA PRIORITARIA ===== */
 .summary-section {
   background: #ffffff;

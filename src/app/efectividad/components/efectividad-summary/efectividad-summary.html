@@ -1,151 +1,141 @@
-<div class="summary-wrapper">
-  <div class="summary-section">
-    <h3 class="summary-title">👤 Efectividad por Operador</h3>
+<!-- SECCIÓN DE OPERADORES -->
+<div class="summary-wrapper" *ngIf="effectiveness.by_operator.length > 0">
 
-    <div *ngIf="effectiveness.by_operator.length === 0" class="empty">
-      Sin datos para el período seleccionado.
-    </div>
-
-    <div *ngIf="effectiveness.by_operator.length > 0">
-
-      <table class="operator-table">
-
-        <thead>
-          <tr>
-            <th></th>
-            <th class="text-left">Operador</th>
-            <th>Actividades</th>
-            <th>Tiempo</th>
-            <th>Σ Estándar</th>
-            <th>Σ Real</th>
-            <th>Efectividad</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <ng-container *ngFor="let op of effectiveness.by_operator">
-
-            <!-- FILA PRINCIPAL -->
-            <tr>
-              <td class="text-center">
-                <button class="btn-expand"
-                        (click)="op.expanded = !op.expanded">
-                  {{ op.expanded ? '−' : '+' }}
-                </button>
-              </td>
-
-              <td class="text-left summary-name">{{ op.name }}</td>
-
-              <td class="text-center">
-                <span class="badge">
-                  {{ op.activities_count }}
-                </span>
-              </td>
-
-              <td class="text-center">
-                {{ op.total_time || '—' }}
-              </td>
-
-              <td class="text-right">{{ op.total_standard }}</td>
-              <td class="text-right">{{ op.total_real }}</td>
-
-              <td class="text-center">
-                <div class="effectiveness-cell">
-
-                  <span class="badge"
-                        [ngClass]="badgeClass(op.effectiveness)">
-                    {{ badgeLabel(op.effectiveness) }}
-                  </span>
-
-                  <div class="progress-bar-wrapper small">
-                    <div class="progress-bar"
-                         [ngClass]="badgeClass(op.effectiveness)"
-                         [style.width.%]="op.effectiveness || 0">
-                    </div>
-                  </div>
-
-                </div>
-              </td>
-            </tr>
-
-            <!-- DETALLE -->
-            <tr *ngIf="op.expanded" class="detail-row">
-              <td colspan="7">
-
-                <div class="detail-container">
-
-                  <!-- ACTIVIDADES -->
-                  <div class="activities-box">
-                    <div class="activities-title">📋 Actividades</div>
-
-                    <div *ngIf="!op.activities || op.activities.length === 0" class="empty">
-                      No hay actividades registradas.
-                    </div>
-
-                    <table *ngIf="op.activities?.length > 0" class="activities-table">
-                      <thead>
-                        <tr>
-                          <th class="text-left">Actividad</th>
-                          <th>Tiempo</th>
-                          <th>Estándar</th>
-                          <th>Real</th>
-                          <th>%</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let act of op.activities">
-                          <td class="text-left">{{ act.name }}</td>
-                          <td class="text-center">{{ act.time }}</td>
-                          <td class="text-right">{{ act.standard }}</td>
-                          <td class="text-right">{{ act.real }}</td>
-                          <td class="text-center">{{ act.effectiveness }}%</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- RESUMEN -->
-                  <div class="summary-box">
-                    <div class="row">
-                      <span>Σ Estándar</span>
-                      <strong>{{ op.total_standard }}</strong>
-                    </div>
-
-                    <div class="row">
-                      <span>Σ Real</span>
-                      <strong>{{ op.total_real }}</strong>
-                    </div>
-
-                    <div class="row">
-                      <span>Actividades</span>
-                      <strong>{{ op.activities_count }}</strong>
-                    </div>
-
-                    <div class="row">
-                      <span>Efectividad</span>
-                      <strong>{{ badgeLabel(op.effectiveness) }}</strong>
-                    </div>
-                  </div>
-
-                </div>
-
-              </td>
-            </tr>
-
-          </ng-container>
-        </tbody>
-
-      </table>
-    </div>
+  <div *ngIf="effectiveness.by_operator.length === 0" class="empty">
+    Sin datos para el período seleccionado.
   </div>
+
+  <div *ngIf="effectiveness.by_operator.length > 0">
+    <table class="operator-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="text-left">Operador</th>
+          <th>Actividades</th>
+          <th>Tiempo</th>
+          <th>Σ Cantidad esperada</th>
+          <th>Σ Real</th>
+          <th>Efectividad</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngFor="let op of effectiveness.by_operator">
+
+          <!-- FILA PRINCIPAL -->
+          <tr>
+            <td class="text-center">
+              <button class="btn-expand"
+                      (click)="op.expanded = !op.expanded">
+                {{ op.expanded ? '−' : '+' }}
+              </button>
+            </td>
+
+            <td class="text-left summary-name">{{ op.name }}</td>
+
+            <td class="text-center">
+              <span class="badge">
+                {{ op.activities_count }}
+              </span>
+            </td>
+
+            <td class="text-center">
+              {{ op.total_time || '—' }}
+            </td>
+
+            <td class="text-right">{{ op.total_standard }}</td>
+            <td class="text-right">{{ op.total_real }}</td>
+
+            <td class="text-center">
+              <div class="effectiveness-cell">
+                <span class="badge"
+                      [ngClass]="badgeClass(op.effectiveness)">
+                  {{ badgeLabel(op.effectiveness) }}
+                </span>
+                <div class="progress-bar-wrapper small">
+                  <div class="progress-bar"
+                       [ngClass]="badgeClass(op.effectiveness)"
+                       [style.width.%]="op.effectiveness || 0">
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- DETALLE -->
+          <tr *ngIf="op.expanded" class="detail-row">
+            <td colspan="7">
+              <div class="detail-container">
+
+                <!-- ACTIVIDADES -->
+                <div class="activities-box">
+                  <div class="activities-title">📋 Actividades</div>
+
+                  <div *ngIf="!op.activities || op.activities.length === 0" class="empty">
+                    No hay actividades registradas.
+                  </div>
+
+                  <table *ngIf="op.activities?.length > 0" class="activities-table">
+                    <thead>
+                      <tr>
+                        <th class="text-left">Actividad</th>
+                        <th>Tiempo</th>
+                        <th>Cantidad esperada</th>
+                        <th>Real</th>
+                        <th>%</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let act of op.activities">
+                        <td class="text-left">{{ act.name }}</td>
+                        <td class="text-center">{{ act.time }}</td>
+                        <td class="text-right">{{ act.standard }}</td>
+                        <td class="text-right">{{ act.real }}</td>
+                        <td class="text-center">{{ act.effectiveness }}%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- RESUMEN -->
+                <div class="summary-box">
+                  <div class="row">
+                    <span>Σ Cantidad esperada</span>
+                    <strong>{{ op.total_standard }}</strong>
+                  </div>
+                  <div class="row">
+                    <span>Σ Real</span>
+                    <strong>{{ op.total_real }}</strong>
+                  </div>
+                  <div class="row">
+                    <span>Actividades</span>
+                    <strong>{{ op.activities_count }}</strong>
+                  </div>
+                  <div class="row">
+                    <span>Efectividad</span>
+                    <strong>{{ badgeLabel(op.effectiveness) }}</strong>
+                  </div>
+                </div>
+
+              </div>
+            </td>
+          </tr>
+
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
-  <!-- SECCIÓN DE PROCESOS (SIN MODIFICAR) -->
-  <div class="summary-section">
-    <h3 class="summary-title">⚙️ Efectividad por Proceso</h3>
-    <div *ngIf="effectiveness.by_process.length === 0" class="empty">
-      Sin datos para el período seleccionado.
-    </div>
+<!-- SECCIÓN DE PROCESOS -->
+<div class="summary-wrapper" *ngIf="effectiveness.by_process.length > 0">
+
+  <div *ngIf="effectiveness.by_process.length === 0" class="empty">
+    Sin datos para el período seleccionado.
+  </div>
+
+  <div *ngIf="effectiveness.by_process.length > 0">
     <div class="summary-card" *ngFor="let pr of effectiveness.by_process">
       <div class="summary-card-header">
         <span class="summary-name">{{ pr.name }}</span>
@@ -159,7 +149,7 @@
           <span class="stat-value">{{ pr.total_real }}</span>
         </div>
         <div class="summary-stat">
-          <span class="stat-label">Estándar</span>
+          <span class="stat-label">Cantidad esperada</span>
           <span class="stat-value">{{ pr.total_standard | number:'1.0-0' }}</span>
         </div>
         <div class="summary-stat">
@@ -175,3 +165,5 @@
       </div>
     </div>
   </div>
+
+</div>

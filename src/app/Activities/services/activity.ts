@@ -51,5 +51,12 @@ export class ActivityService {
 
   getHistory() {
   return this.http.get<any[]>(`${this.api}/history`);
-}
+  
+  }
+
+  reportManual(data: any) {
+  return this.http.post(`${this.api}/report-manual`, data);
+  
+  }
+  
 }

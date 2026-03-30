@@ -4,6 +4,7 @@ import { ActivityListContainerComponent } from './Activities/pages/activity-list
 import { ActivityStartContainerComponent } from './Activities/pages/activity-start-container/activity-start-container';
 import { ActivityDashboardContainerComponent } from './Activities/pages/activity-dashboard-container/activity-dashboard-container';
 import { EfectividadDashboardContainerComponent } from './efectividad/pages/efectividad-dashboard-container/efectividad-dashboard-container';
+import { ManualReportContainerComponent } from './Activities/pages/manual-report-container/manual-report-container';
 
 export const routes: Routes = [
   {
@@ -13,7 +14,8 @@ export const routes: Routes = [
       { path: '',                    component: ActivityDashboardContainerComponent },
       { path: 'start',               component: ActivityStartContainerComponent },
       { path: 'activities',          component: ActivityListContainerComponent },
-      { path: 'reports/efectividad', component: EfectividadDashboardContainerComponent }
+      { path: 'reports/efectividad', component: EfectividadDashboardContainerComponent },
+      { path: 'reports/manual',      component: ManualReportContainerComponent },
     ]
   }
 ];
