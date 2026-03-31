@@ -1,0 +1,97 @@
+<div class="admin-panel">
+  <h2 class="admin-title">Administración</h2>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.active]="activeTab === 'operators'" (click)="activeTab = 'operators'">
+      👷 Operadores
+    </button>
+    <button [class.active]="activeTab === 'processes'" (click)="activeTab = 'processes'">
+      ⚙️ Procesos
+    </button>
+  </div>
+
+  <!-- ── OPERADORES ── -->
+  <div *ngIf="activeTab === 'operators'">
+    <div class="section-header">
+      <span>{{ operators.length }} operador(es) registrados</span>
+      <button class="btn-add" (click)="showOperatorForm = !showOperatorForm">
+        {{ showOperatorForm ? '✕ Cancelar' : '+ Agregar operador' }}
+      </button>
+    </div>
+
+    <div class="form-card" *ngIf="showOperatorForm">
+      <input placeholder="Nombre completo"    [(ngModel)]="newOperator.name" />
+      <input placeholder="Correo electrónico" [(ngModel)]="newOperator.email"    type="email" />
+      <input placeholder="Contraseña"         [(ngModel)]="newOperator.password" type="password" />
+      <button class="btn-save" (click)="submitOperator()">Guardar operador</button>
+    </div>
+
+    <div class="item-list">
+      <div class="item-row" *ngFor="let op of operators">
+        <div class="item-info">
+          <span class="item-name">{{ op.name }}</span>
+          <span class="item-sub">{{ op.email }}</span>
+        </div>
+        <div class="item-actions">
+          <span class="badge" [ngClass]="op.is_active ? 'badge-active' : 'badge-inactive'">
+            {{ op.is_active ? 'Activo' : 'Inactivo' }}
+          </span>
+          <button class="btn-toggle" (click)="toggleOperator.emit(op.id)">
+            {{ op.is_active ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button class="btn-delete" (click)="askDelete(op.id, 'operator')">Eliminar</button>
+        </div>
+      </div>
+      <div class="empty" *ngIf="operators.length === 0">No hay operadores registrados.</div>
+    </div>
+  </div>
+
+  <!-- ── PROCESOS ── -->
+  <div *ngIf="activeTab === 'processes'">
+    <div class="section-header">
+      <span>{{ processes.length }} proceso(s) registrados</span>
+      <button class="btn-add" (click)="showProcessForm = !showProcessForm">
+        {{ showProcessForm ? '✕ Cancelar' : '+ Agregar proceso' }}
+      </button>
+    </div>
+
+    <div class="form-card" *ngIf="showProcessForm">
+      <input placeholder="Nombre del proceso"     [(ngModel)]="newProcess.name" />
+      <input placeholder="Descripción (opcional)" [(ngModel)]="newProcess.description" />
+      <input placeholder="Meta por hora"          [(ngModel)]="newProcess.base_per_hour" type="number" min="0" />
+      <button class="btn-save" (click)="submitProcess()">Guardar proceso</button>
+    </div>
+
+    <div class="item-list">
+      <div class="item-row" *ngFor="let pr of processes">
+        <div class="item-info">
+          <span class="item-name">{{ pr.name }}</span>
+          <span class="item-sub">Meta: {{ pr.base_per_hour }}/hr</span>
+        </div>
+        <div class="item-actions">
+          <span class="badge" [ngClass]="pr.is_active ? 'badge-active' : 'badge-inactive'">
+            {{ pr.is_active ? 'Activo' : 'Inactivo' }}
+          </span>
+          <button class="btn-toggle" (click)="toggleProcess.emit(pr.id)">
+            {{ pr.is_active ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button class="btn-delete" (click)="askDelete(pr.id, 'process')">Eliminar</button>
+        </div>
+      </div>
+      <div class="empty" *ngIf="processes.length === 0">No hay procesos registrados.</div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMACIÓN -->
+  <div class="modal-overlay" *ngIf="confirmDeleteId !== null">
+    <div class="modal">
+      <p>¿Estás seguro de que deseas eliminar este registro?</p>
+      <p class="modal-warning">⚠️ Si tiene actividades registradas no podrá eliminarse.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel"  (click)="cancelDelete()">Cancelar</button>
+        <button class="btn-confirm" (click)="confirmDelete()">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>

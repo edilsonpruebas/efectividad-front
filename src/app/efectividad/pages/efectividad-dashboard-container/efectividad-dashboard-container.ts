@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EfectividadDashboardComponent } from '../../components/efectividad-dashboard/efectividad-dashboard';
 import { EfectividadService, EfectividadFilter } from '../../services/efectividad';
 import { Subject, takeUntil } from 'rxjs';
+import { EfectividadAdminContainerComponent } from '../efectividad-admin-container/efectividad-admin-container';
 
 @Component({
   selector: 'app-efectividad-dashboard-container',
   standalone: true,
-  imports: [EfectividadDashboardComponent],
+  imports: [EfectividadDashboardComponent, EfectividadAdminContainerComponent],
   template: `
     <app-efectividad-dashboard
       [activities]="activities"
@@ -17,6 +18,8 @@ import { Subject, takeUntil } from 'rxjs';
       [loading]="loading"
       (onFilter)="onFilter($event)">
     </app-efectividad-dashboard>
+    <app-efectividad-admin-container></app-efectividad-admin-container>
+
   `
 })
 export class EfectividadDashboardContainerComponent implements OnInit, OnDestroy {

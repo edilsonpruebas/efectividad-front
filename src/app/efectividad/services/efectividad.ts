@@ -15,6 +15,7 @@ export interface EfectividadFilter {
 export class EfectividadService {
 
   private api     = 'http://localhost:8000/api/activities/dashboard';
+  private baseApi = 'http://localhost:8000/api'; // ← NUEVO
   private POLL_MS = 10000;
 
   private filters$ = new BehaviorSubject<EfectividadFilter>({
@@ -39,7 +40,6 @@ export class EfectividadService {
 
   startPolling() {
     this.destroy$ = new Subject<void>();
-
     // ✅ FIX #1: filters$ como fuente — reacciona a cada cambio de filtro
     this.filters$
       .pipe(
@@ -63,8 +63,7 @@ export class EfectividadService {
       .subscribe(data => {
         this.loadingSubject.next(false);
         if (!data) return;
-
-        // ✅ FIX #2: NO tocar effectiveness — viene calculado correctamente del backend
+   // ✅ FIX #2: NO tocar effectiveness — viene calculado correctamente del backend
         this.dataSubject.next({
           activities:    data.activities    ?? [],
           metrics:       data.metrics       ?? {},
@@ -74,7 +73,7 @@ export class EfectividadService {
   }
 
   setFilters(filters: EfectividadFilter) {
-    this.filters$.next(filters); // ✅ esto ahora dispara el switchMap automáticamente
+    this.filters$.next(filters);
   }
 
   stopPolling() {
@@ -83,10 +82,46 @@ export class EfectividadService {
   }
 
   getOperators() {
-    return this.http.get<any[]>('http://localhost:8000/api/operators');
+    return this.http.get<any[]>(`${this.baseApi}/operators/active`);
   }
 
   getProcesses() {
-    return this.http.get<any[]>('http://localhost:8000/api/processes');
+    return this.http.get<any[]>(`${this.baseApi}/processes`);
+  }
+
+  // ── OPERADORES ADMIN ─────────────────────────────────
+
+  getAllOperators() {
+    return this.http.get<any[]>(`${this.baseApi}/operators`);
+  }
+
+  createOperator(dto: { name: string; email: string; password: string }) {
+    return this.http.post<{ message: string; data: any }>(`${this.baseApi}/operators`, dto);
+  }
+
+  toggleOperator(id: number) {
+    return this.http.patch<{ message: string; data: any }>(`${this.baseApi}/operators/${id}/toggle`, {});
+  }
+
+  deleteOperator(id: number) {
+    return this.http.delete<{ message: string }>(`${this.baseApi}/operators/${id}`);
+  }
+
+  // ── PROCESOS ADMIN ───────────────────────────────────
+
+  getAllProcesses() {
+    return this.http.get<any[]>(`${this.baseApi}/processes/all`);
+  }
+
+  createProcess(dto: { name: string; description?: string; base_per_hour: number }) {
+    return this.http.post<{ message: string; data: any }>(`${this.baseApi}/processes`, dto);
+  }
+
+  toggleProcess(id: number) {
+    return this.http.patch<{ message: string; data: any }>(`${this.baseApi}/processes/${id}/toggle`, {});
+  }
+
+  deleteProcess(id: number) {
+    return this.http.delete<{ message: string }>(`${this.baseApi}/processes/${id}`);
   }
 }
