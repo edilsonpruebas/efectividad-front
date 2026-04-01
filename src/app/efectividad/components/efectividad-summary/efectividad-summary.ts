@@ -14,6 +14,11 @@ export class EfectividadSummaryComponent {
   sortDirection: 'asc' | 'desc' | null = null;
   processSortDirection: 'asc' | 'desc' | null = null;
 
+  // 🔢 PROPIEDADES DE PAGINACIÓN
+  currentPageOperator = 1;
+  currentPageProcess = 1;
+  itemsPerPage = 5;
+
   get sortedOperators() {
     if (!this.effectiveness?.by_operator) return [];
     const operators = [...this.effectiveness.by_operator];
@@ -40,20 +45,60 @@ export class EfectividadSummaryComponent {
     return processes;
   }
 
+  // 📄 GETTERS PARA PAGINACIÓN
+  get paginatedOperators() {
+    const start = (this.currentPageOperator - 1) * this.itemsPerPage;
+    return this.sortedOperators.slice(start, start + this.itemsPerPage);
+  }
+
+  get paginatedProcesses() {
+    const start = (this.currentPageProcess - 1) * this.itemsPerPage;
+    return this.sortedProcesses.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalOperatorPages() {
+    return Math.ceil(this.sortedOperators.length / this.itemsPerPage) || 1;
+  }
+
+  get totalProcessPages() {
+    return Math.ceil(this.sortedProcesses.length / this.itemsPerPage) || 1;
+  }
+
   sortAsc() {
     this.sortDirection = 'asc';
+    this.currentPageOperator = 1;
   }
 
   sortDesc() {
     this.sortDirection = 'desc';
+    this.currentPageOperator = 1;
   }
 
   sortProcessesAsc() {
     this.processSortDirection = 'asc';
+    this.currentPageProcess = 1;
   }
 
   sortProcessesDesc() {
     this.processSortDirection = 'desc';
+    this.currentPageProcess = 1;
+  }
+
+  // 🔘 MÉTODOS DE NAVEGACIÓN
+  prevPageOperator() {
+    if (this.currentPageOperator > 1) this.currentPageOperator--;
+  }
+
+  nextPageOperator() {
+    if (this.currentPageOperator < this.totalOperatorPages) this.currentPageOperator++;
+  }
+
+  prevPageProcess() {
+    if (this.currentPageProcess > 1) this.currentPageProcess--;
+  }
+
+  nextPageProcess() {
+    if (this.currentPageProcess < this.totalProcessPages) this.currentPageProcess++;
   }
 
   badgeClass(value: number | null): string {

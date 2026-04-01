@@ -38,7 +38,7 @@
       </thead>
 
       <tbody>
-        <ng-container *ngFor="let op of sortedOperators">
+        <ng-container *ngFor="let op of paginatedOperators">
 
           <!-- FILA PRINCIPAL -->
           <tr>
@@ -169,6 +169,27 @@
         </ng-container>
       </tbody>
     </table>
+
+    <!-- 🔢 PAGINACIÓN OPERADORES -->
+    <div class="pagination" *ngIf="totalOperatorPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
+      <button 
+        (click)="prevPageOperator()" 
+        [disabled]="currentPageOperator === 1"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPageOperator === 1 ? '0.5' : '1'">
+        ← Anterior
+      </button>
+      <span style="font-size: 14px; color: #374151;">
+        Página {{ currentPageOperator }} de {{ totalOperatorPages }}
+      </span>
+      <button 
+        (click)="nextPageOperator()" 
+        [disabled]="currentPageOperator === totalOperatorPages"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPageOperator === totalOperatorPages ? '0.5' : '1'">
+        Siguiente →
+      </button>
+    </div>
   </div>
 
 </div>
@@ -181,54 +202,81 @@
   </div>
 
   <div *ngIf="effectiveness.by_process.length > 0">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 0 4px;">
-      <h3 style="margin: 0; font-size: 16px; color: #1e293b; font-weight: 600;">Procesos</h3>
-      <div style="display: flex; gap: 4px; align-items: center;">
-        <span style="font-size: 12px; color: #64748b; margin-right: 8px;">Ordenar por efectividad:</span>
-        <button (click)="sortProcessesDesc()" 
-                [style.opacity]="processSortDirection === 'desc' ? '1' : '0.5'"
-                style="cursor: pointer; border: none; background: none; padding: 4px 8px; font-size: 14px; color: #1e293b;"
-                title="Mayor a menor">
-          ▼
-        </button>
-        <button (click)="sortProcessesAsc()" 
-                [style.opacity]="processSortDirection === 'asc' ? '1' : '0.5'"
-                style="cursor: pointer; border: none; background: none; padding: 4px 8px; font-size: 14px; color: #1e293b;"
-                title="Menor a mayor">
-          ▲
-        </button>
-      </div>
-    </div>
-    
-    <div class="summary-card" *ngFor="let pr of sortedProcesses">
-      <div class="summary-card-header">
-        <span class="summary-name">{{ pr.name }}</span>
-        <span class="badge" [ngClass]="badgeClass(pr.effectiveness)">
-          {{ badgeLabel(pr.effectiveness) }}
-        </span>
-      </div>
+    <!-- TABLA CON MISMO ESTILO QUE OPERADORES -->
+    <table class="operator-table">
+      <thead>
+        <tr>
+          <th class="text-left">Proceso</th>
+          <th>Actividades</th>
+          <th>Σ Cantidad esperada</th>
+          <th>Σ Real</th>
+          <th>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span>Efectividad</span>
+              <div style="display: flex; gap: 4px;">
+                <button (click)="sortProcessesDesc()" 
+                        [style.opacity]="processSortDirection === 'desc' ? '1' : '0.5'"
+                        style="cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 12px;"
+                        title="Mayor a menor">
+                  ▼
+                </button>
+                <button (click)="sortProcessesAsc()" 
+                        [style.opacity]="processSortDirection === 'asc' ? '1' : '0.5'"
+                        style="cursor: pointer; border: none; background: none; padding: 2px 4px; font-size: 12px;"
+                        title="Menor a mayor">
+                  ▲
+                </button>
+              </div>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pr of paginatedProcesses">
+          <td class="text-left summary-name">{{ pr.name }}</td>
+          <td class="text-center">
+            <span class="badge">
+              {{ pr.activities_count }}
+            </span>
+          </td>
+          <td class="text-right">{{ pr.total_standard | number:'1.0-0' }}</td>
+          <td class="text-right">{{ pr.total_real }}</td>
+          <td class="text-center">
+            <div class="effectiveness-cell">
+              <span class="badge" [ngClass]="badgeClass(pr.effectiveness)">
+                {{ badgeLabel(pr.effectiveness) }}
+              </span>
+              <div class="progress-bar-wrapper small">
+                <div class="progress-bar"
+                     [ngClass]="badgeClass(pr.effectiveness)"
+                     [style.width.%]="pr.effectiveness !== null ? (pr.effectiveness > 100 ? 100 : pr.effectiveness) : 0">
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-      <div class="summary-card-body">
-        <div class="summary-stat">
-          <span class="stat-label">Real</span>
-          <span class="stat-value">{{ pr.total_real }}</span>
-        </div>
-        <div class="summary-stat">
-          <span class="stat-label">Cantidad esperada</span>
-          <span class="stat-value">{{ pr.total_standard | number:'1.0-0' }}</span>
-        </div>
-        <div class="summary-stat">
-          <span class="stat-label">Actividades</span>
-          <span class="stat-value">{{ pr.activities_count }}</span>
-        </div>
-      </div>
-
-      <div class="progress-bar-wrapper">
-        <div class="progress-bar"
-             [ngClass]="badgeClass(pr.effectiveness)"
-             [style.width.%]="pr.effectiveness !== null ? (pr.effectiveness > 100 ? 100 : pr.effectiveness) : 0">
-        </div>
-      </div>
+    <!-- 🔢 PAGINACIÓN PROCESOS -->
+    <div class="pagination" *ngIf="totalProcessPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
+      <button 
+        (click)="prevPageProcess()" 
+        [disabled]="currentPageProcess === 1"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPageProcess === 1 ? '0.5' : '1'">
+        ← Anterior
+      </button>
+      <span style="font-size: 14px; color: #374151;">
+        Página {{ currentPageProcess }} de {{ totalProcessPages }}
+      </span>
+      <button 
+        (click)="nextPageProcess()" 
+        [disabled]="currentPageProcess === totalProcessPages"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPageProcess === totalProcessPages ? '0.5' : '1'">
+        Siguiente →
+      </button>
     </div>
   </div>
 
