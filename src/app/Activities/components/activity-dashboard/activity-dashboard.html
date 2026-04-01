@@ -49,36 +49,39 @@
     </div>
 
     <div *ngFor="let act of activities; let i = index" class="card" [style.animation-delay]="i * 0.1 + 's'">
-      
-      <div class="card-info">
-        <div class="name">{{act.operator.name}}</div>
-        <div class="process">
-          <span class="process-dot"></span>
-          {{act.process.name}}
-        </div>
-        <div class="time">
-          <span class="time-icon">🕐</span>
-          {{act.start_time | date:'shortTime'}} - 
-          <span class="duration">En curso</span>
-        </div>
-      </div>
-
-      <div class="card-actions">
-        <div class="input-group">
-          <label class="input-label">Cantidad</label>
-          <input type="number"
-                 [(ngModel)]="quantities[act.id]"
-                 placeholder="0"
-                 min="0">
-        </div>
-
-        <button (click)="stop(act)" class="btn btn-stop">
-          <span class="btn-icon">✔</span>
-          <span>Finalizar</span>
-        </button>
-      </div>
-
+  
+  <div class="card-info">
+    <div class="name">{{act.operator.name}}</div>
+    <div class="process">
+      <span class="process-dot"></span>
+      {{act.process.name}}
+      <span class="base-rate" *ngIf="act.process?.base_per_hour">
+        • {{act.process.base_per_hour}} uds/hr
+      </span>
     </div>
+    <div class="time">
+      <span class="time-icon">🕐</span>
+      {{act.start_time | date:'shortTime'}} - 
+      <span class="duration">En curso</span>
+    </div>
+  </div>
+
+  <div class="card-actions">
+    <div class="input-group">
+      <label class="input-label">Cantidad</label>
+      <input type="number"
+             [(ngModel)]="quantities[act.id]"
+             placeholder="0"
+             min="0">
+    </div>
+
+    <button (click)="stop(act)" class="btn btn-stop">
+      <span class="btn-icon">✔</span>
+      <span>Finalizar</span>
+    </button>
+  </div>
+
+</div>
 
   </div>
 

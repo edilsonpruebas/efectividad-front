@@ -13,7 +13,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let act of activities">
+      <tr *ngFor="let act of paginatedActivities">
         <td>{{ act.id }}</td>
         <td>{{ act.operator?.name ?? '—' }}</td>
         <td>{{ act.process?.name ?? '—' }}</td>
@@ -32,4 +32,25 @@
       </tr>
     </tbody>
   </table>
+  
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button 
+      class="pagination-btn" 
+      [disabled]="currentPage === 1"
+      (click)="goToPage(currentPage - 1)">
+      ← Anterior
+    </button>
+    
+    <span class="pagination-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+    
+    <button 
+      class="pagination-btn" 
+      [disabled]="currentPage === totalPages"
+      (click)="goToPage(currentPage + 1)">
+      Siguiente →
+    </button>
+  </div>
 </div>

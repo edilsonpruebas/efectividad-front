@@ -36,6 +36,57 @@ export class EfectividadAdminComponent {
   confirmDeleteId:   number | null            = null;
   confirmDeleteType: 'operator' | 'process' | null = null;
 
+  // 🔍 PROPIEDADES PARA BÚSQUEDA Y PAGINACIÓN
+  searchQuery: string = '';
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+
+  // GETTERS PARA OPERADORES (FILTRADO + PAGINACIÓN)
+  get filteredOperators(): Operator[] {
+    if (!this.searchQuery) return this.operators;
+    const q = this.searchQuery.toLowerCase();
+    return this.operators.filter(op => op.name.toLowerCase().includes(q));
+  }
+
+  get paginatedOperators(): Operator[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredOperators.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalOperatorPages(): number {
+    return Math.ceil(this.filteredOperators.length / this.itemsPerPage) || 1;
+  }
+
+  // GETTERS PARA PROCESOS (FILTRADO + PAGINACIÓN)
+  get filteredProcesses(): Process[] {
+    if (!this.searchQuery) return this.processes;
+    const q = this.searchQuery.toLowerCase();
+    return this.processes.filter(pr => pr.name.toLowerCase().includes(q));
+  }
+
+  get paginatedProcesses(): Process[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredProcesses.slice(start, start + this.itemsPerPage);
+  }
+
+  get totalProcessPages(): number {
+    return Math.ceil(this.filteredProcesses.length / this.itemsPerPage) || 1;
+  }
+
+  // MÉTODOS DE PAGINACIÓN
+  prevPage() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
+  nextPage(totalPages: number) {
+    if (this.currentPage < totalPages) this.currentPage++;
+  }
+
+  resetFilters() {
+    this.searchQuery = '';
+    this.currentPage = 1;
+  }
+
   submitOperator() {
     if (!this.newOperator.name || !this.newOperator.email || !this.newOperator.password) return;
     this.createOperator.emit({ ...this.newOperator });

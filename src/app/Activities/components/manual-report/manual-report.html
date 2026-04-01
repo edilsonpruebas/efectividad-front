@@ -1,61 +1,148 @@
 <div class="report-wrapper">
 
   <div class="report-header">
-    <h2>📝 Reporte Manual de Actividad</h2>
-    <p>Registra una actividad que ya fue completada</p>
+    <div class="header-icon">📝</div>
+    <div class="header-content">
+      <h2>Reporte Manual de Actividad</h2>
+      <p>Registra una actividad completada fuera del sistema automatizado</p>
+    </div>
   </div>
 
-  <div class="alert alert-success" *ngIf="success">
-    ✅ Reporte registrado correctamente.
+  <!-- Alertas -->
+  <div class="alert alert-success" *ngIf="success" @fadeIn>
+    <span class="alert-icon">✅</span>
+    <span>Reporte registrado correctamente</span>
   </div>
 
-  <div class="alert alert-error" *ngIf="error">
-    ⚠️ {{ error }}
+  <div class="alert alert-error" *ngIf="error" @fadeIn>
+    <span class="alert-icon">⚠️</span>
+    <span>{{ error }}</span>
   </div>
 
   <div class="report-form">
-
-    <div class="form-row">
-      <div class="form-group">
-        <label>👤 Operador responsable</label>
-        <select [(ngModel)]="form.operator_id">
-          <option [ngValue]="null" disabled selected>Seleccionar operador...</option>
-          <option *ngFor="let op of operators" [value]="op.id">{{ op.name }}</option>
-        </select>
+    
+    <!-- Sección: Información General -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-icon">👤</span>
+        <span>Información General</span>
       </div>
+      
+      <div class="form-row">
+        <div class="form-group required">
+          <label>
+            Operador responsable
+            <span class="required-mark" title="Campo obligatorio">*</span>
+          </label>
+          <div class="input-wrapper">
+            <select [(ngModel)]="form.operator_id" [class.filled]="form.operator_id">
+              <option [ngValue]="null" disabled>Seleccionar operador...</option>
+              <option *ngFor="let op of operators" [value]="op.id">{{ op.name }}</option>
+            </select>
+            <span class="input-icon">▼</span>
+          </div>
+          <span class="hint">Selecciona el operador que realizó la actividad</span>
+        </div>
 
-      <div class="form-group">
-        <label>⚙️ Proceso</label>
-        <select [(ngModel)]="form.process_id">
-          <option [ngValue]="null" disabled selected>Seleccionar proceso...</option>
-          <option *ngFor="let pr of processes" [value]="pr.id">{{ pr.name }}</option>
-        </select>
+        <div class="form-group required">
+          <label>
+            Proceso ejecutado
+            <span class="required-mark" title="Campo obligatorio">*</span>
+          </label>
+          <div class="input-wrapper">
+            <select [(ngModel)]="form.process_id" [class.filled]="form.process_id">
+              <option [ngValue]="null" disabled>Seleccionar proceso...</option>
+              <option *ngFor="let pr of processes" [value]="pr.id">{{ pr.name }}</option>
+            </select>
+            <span class="input-icon">▼</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>🕐 Hora de inicio</label>
-        <input type="datetime-local" [(ngModel)]="form.start_time">
+    <!-- Sección: Tiempos -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-icon">🕐</span>
+        <span>Tiempos de Ejecución</span>
       </div>
+      
+      <div class="form-row">
+        <div class="form-group required">
+          <label>
+            Hora de inicio
+            <span class="required-mark" title="Campo obligatorio">*</span>
+          </label>
+          <input 
+            type="datetime-local" 
+            [(ngModel)]="form.start_time"
+            [class.filled]="form.start_time"
+            placeholder="Seleccionar fecha y hora">
+        </div>
 
-      <div class="form-group">
-        <label>🕑 Hora de finalización</label>
-        <input type="datetime-local" [(ngModel)]="form.end_time">
+        <div class="form-group required">
+          <label>
+            Hora de finalización
+            <span class="required-mark" title="Campo obligatorio">*</span>
+          </label>
+          <input 
+            type="datetime-local" 
+            [(ngModel)]="form.end_time"
+            [class.filled]="form.end_time"
+            placeholder="Seleccionar fecha y hora">
+        </div>
+      </div>
+      
+      <div class="time-helper" *ngIf="form.start_time && form.end_time">
+        <span>⏱️ Duración calculada: </span>
+        <strong>{{ calculateDuration() }}</strong>
       </div>
     </div>
 
-    <div class="form-row single">
-      <div class="form-group">
-        <label>📦 Cantidad producida</label>
-        <input type="number" [(ngModel)]="form.quantity" placeholder="0" min="0">
+    <!-- Sección: Producción -->
+    <div class="form-section highlight">
+      <div class="section-title">
+        <span class="section-icon">📦</span>
+        <span>Producción</span>
+      </div>
+      
+      <div class="form-row single">
+        <div class="form-group required">
+          <label>
+            Cantidad producida
+            <span class="required-mark" title="Campo obligatorio">*</span>
+          </label>
+          <div class="input-wrapper quantity-wrapper">
+            <input 
+              type="number" 
+              [(ngModel)]="form.quantity" 
+              placeholder="0" 
+              min="0"
+              [class.filled]="form.quantity"
+              class="quantity-input">
+            <span class="unit-label">unidades</span>
+          </div>
+          <span class="hint">Ingresa el total de unidades fabricadas en este proceso</span>
+        </div>
       </div>
     </div>
 
-    <button (click)="submit()" class="btn-submit" [disabled]="loading">
-      <span *ngIf="!loading">💾 Registrar Reporte</span>
-      <span *ngIf="loading">⏳ Guardando...</span>
-    </button>
+    <!-- Acciones -->
+    <div class="form-actions">
+      <button 
+        (click)="submit()" 
+        class="btn-submit" 
+        [disabled]="loading || !isFormValid()"
+        [class.ready]="isFormValid() && !loading">
+        <span class="btn-icon" *ngIf="!loading">💾</span>
+        <span class="btn-icon spinner" *ngIf="loading">⏳</span>
+        <span>{{ loading ? 'Guardando reporte...' : 'Registrar Reporte' }}</span>
+      </button>
+      
+      <span class="form-status" *ngIf="!isFormValid()">
+        Completa todos los campos obligatorios (*)
+      </span>
+    </div>
 
   </div>
 </div>

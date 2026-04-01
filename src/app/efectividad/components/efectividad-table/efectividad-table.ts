@@ -10,6 +10,25 @@ import { NgFor, NgIf, NgClass, DatePipe } from '@angular/common';
 })
 export class EfectividadTableComponent {
   @Input() activities: any[] = [];
+  
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+
+  get paginatedActivities(): any[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.activities.slice(startIndex, endIndex);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.activities.length / this.itemsPerPage);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
 
   statusLabel(s: string) {
     return { 'OPEN': '🟢 En proceso', 'CLOSED': '✅ Finalizada', 'CANCELLED': '❌ Cancelada' }[s] ?? s;

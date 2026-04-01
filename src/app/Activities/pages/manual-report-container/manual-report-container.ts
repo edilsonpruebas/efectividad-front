@@ -11,7 +11,10 @@ import { ManualReportComponent } from '../../components/manual-report/manual-rep
 })
 export class ManualReportContainerComponent implements OnInit {
 
-  @ViewChild('manualReportRef') manualReportRef!: ManualReportComponent;
+  // ✅ se añade { read: ManualReportComponent } para obtener la instancia
+  // del componente y no el ElementRef del DOM
+  @ViewChild('manualReportRef', { read: ManualReportComponent })
+  manualReportRef!: ManualReportComponent;
 
   operators: any[] = [];
   processes: any[] = [];
@@ -28,8 +31,8 @@ export class ManualReportContainerComponent implements OnInit {
 
   submitManualReport(form: any) {
     this.activityService.reportManual(form).subscribe({
-      next:  ()  => this.manualReportRef.markSuccess(),
-      error: (e) => this.manualReportRef.markError(
+      next:  ()  => this.manualReportRef?.markSuccess(),
+      error: (e) => this.manualReportRef?.markError(
         e.error?.error ?? 'Error al registrar el reporte'
       )
     });

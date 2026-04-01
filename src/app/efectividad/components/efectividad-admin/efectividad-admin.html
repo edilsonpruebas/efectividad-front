@@ -3,10 +3,10 @@
 
   <!-- TABS -->
   <div class="tabs">
-    <button [class.active]="activeTab === 'operators'" (click)="activeTab = 'operators'">
+    <button [class.active]="activeTab === 'operators'" (click)="activeTab = 'operators'; resetFilters()">
       👷 Operadores
     </button>
-    <button [class.active]="activeTab === 'processes'" (click)="activeTab = 'processes'">
+    <button [class.active]="activeTab === 'processes'" (click)="activeTab = 'processes'; resetFilters()">
       ⚙️ Procesos
     </button>
   </div>
@@ -14,7 +14,7 @@
   <!-- ── OPERADORES ── -->
   <div *ngIf="activeTab === 'operators'">
     <div class="section-header">
-      <span>{{ operators.length }} operador(es) registrados</span>
+      <span>{{ filteredOperators.length }} operador(es) encontrados</span>
       <button class="btn-add" (click)="showOperatorForm = !showOperatorForm">
         {{ showOperatorForm ? '✕ Cancelar' : '+ Agregar operador' }}
       </button>
@@ -27,8 +27,18 @@
       <button class="btn-save" (click)="submitOperator()">Guardar operador</button>
     </div>
 
+    <!-- 🔍 BUSCADOR -->
+    <div class="search-box" style="margin: 16px 0;">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (input)="currentPage = 1"
+        placeholder="🔍 Buscar operador por nombre..." 
+        style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;">
+    </div>
+
     <div class="item-list">
-      <div class="item-row" *ngFor="let op of operators">
+      <div class="item-row" *ngFor="let op of paginatedOperators">
         <div class="item-info">
           <span class="item-name">{{ op.name }}</span>
           <span class="item-sub">{{ op.email }}</span>
@@ -43,14 +53,37 @@
           <button class="btn-delete" (click)="askDelete(op.id, 'operator')">Eliminar</button>
         </div>
       </div>
-      <div class="empty" *ngIf="operators.length === 0">No hay operadores registrados.</div>
+      <div class="empty" *ngIf="filteredOperators.length === 0">
+        {{ searchQuery ? 'No se encontraron operadores con ese nombre.' : 'No hay operadores registrados.' }}
+      </div>
+    </div>
+
+    <!-- 🔢 PAGINACIÓN -->
+    <div class="pagination" *ngIf="totalOperatorPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
+      <button 
+        (click)="prevPage()" 
+        [disabled]="currentPage === 1"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPage === 1 ? '0.5' : '1'">
+        ← Anterior
+      </button>
+      <span style="font-size: 14px; color: #374151;">
+        Página {{ currentPage }} de {{ totalOperatorPages }}
+      </span>
+      <button 
+        (click)="nextPage(totalOperatorPages)" 
+        [disabled]="currentPage === totalOperatorPages"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPage === totalOperatorPages ? '0.5' : '1'">
+        Siguiente →
+      </button>
     </div>
   </div>
 
   <!-- ── PROCESOS ── -->
   <div *ngIf="activeTab === 'processes'">
     <div class="section-header">
-      <span>{{ processes.length }} proceso(s) registrados</span>
+      <span>{{ filteredProcesses.length }} proceso(s) encontrados</span>
       <button class="btn-add" (click)="showProcessForm = !showProcessForm">
         {{ showProcessForm ? '✕ Cancelar' : '+ Agregar proceso' }}
       </button>
@@ -63,8 +96,18 @@
       <button class="btn-save" (click)="submitProcess()">Guardar proceso</button>
     </div>
 
+    <!-- 🔍 BUSCADOR -->
+    <div class="search-box" style="margin: 16px 0;">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (input)="currentPage = 1"
+        placeholder="🔍 Buscar proceso por nombre..." 
+        style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;">
+    </div>
+
     <div class="item-list">
-      <div class="item-row" *ngFor="let pr of processes">
+      <div class="item-row" *ngFor="let pr of paginatedProcesses">
         <div class="item-info">
           <span class="item-name">{{ pr.name }}</span>
           <span class="item-sub">Meta: {{ pr.base_per_hour }}/hr</span>
@@ -79,7 +122,30 @@
           <button class="btn-delete" (click)="askDelete(pr.id, 'process')">Eliminar</button>
         </div>
       </div>
-      <div class="empty" *ngIf="processes.length === 0">No hay procesos registrados.</div>
+      <div class="empty" *ngIf="filteredProcesses.length === 0">
+        {{ searchQuery ? 'No se encontraron procesos con ese nombre.' : 'No hay procesos registrados.' }}
+      </div>
+    </div>
+
+    <!-- 🔢 PAGINACIÓN -->
+    <div class="pagination" *ngIf="totalProcessPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
+      <button 
+        (click)="prevPage()" 
+        [disabled]="currentPage === 1"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPage === 1 ? '0.5' : '1'">
+        ← Anterior
+      </button>
+      <span style="font-size: 14px; color: #374151;">
+        Página {{ currentPage }} de {{ totalProcessPages }}
+      </span>
+      <button 
+        (click)="nextPage(totalProcessPages)" 
+        [disabled]="currentPage === totalProcessPages"
+        style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
+        [style.opacity]="currentPage === totalProcessPages ? '0.5' : '1'">
+        Siguiente →
+      </button>
     </div>
   </div>
 

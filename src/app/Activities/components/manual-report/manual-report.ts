@@ -27,6 +27,31 @@ export class ManualReportComponent {
     quantity:    null as number | null
   };
 
+  isFormValid(): boolean {
+    return !!this.form.operator_id && 
+           !!this.form.process_id && 
+           !!this.form.start_time && 
+           !!this.form.end_time && 
+           !!this.form.quantity && 
+           this.form.quantity > 0;
+  }
+
+  calculateDuration(): string {
+    if (!this.form.start_time || !this.form.end_time) return '';
+    
+    const start = new Date(this.form.start_time);
+    const end = new Date(this.form.end_time);
+    const diffMinutes = (end.getTime() - start.getTime()) / 1000 / 60;
+    
+    if (diffMinutes < 0) return 'Verificar fechas';
+    if (diffMinutes === 0) return '0 minutos';
+    if (diffMinutes < 60) return `${Math.round(diffMinutes)} minutos`;
+    
+    const hours = Math.floor(diffMinutes / 60);
+    const mins = Math.round(diffMinutes % 60);
+    return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+  }
+
   submit() {
     this.success = false;
     this.error   = '';
