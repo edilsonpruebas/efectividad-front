@@ -3,7 +3,7 @@ import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-activity-list',
-  standalone: true,        // 👈 faltaba
+  standalone: true,
   imports: [NgFor],
   templateUrl: './activity-list.html'
 })

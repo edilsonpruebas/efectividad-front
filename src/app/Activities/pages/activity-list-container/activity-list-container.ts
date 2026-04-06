@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivityDashboardComponent } from '../../components/activity-dashboard/activity-dashboard';
 import { ActivityListComponent } from '../../components/activity-list/activity-list';
 import { ActivityStopComponent } from '../../components/activity-stop/activity-stop';
 import { ActivityService } from '../../services/activity';
@@ -31,11 +30,10 @@ export class ActivityListContainerComponent implements OnInit {
   constructor(private service: ActivityService) {}
 
   ngOnInit() {
-    // 👈 suscribirse al stream en lugar de llamar loadOpen()
     this.service.activities$.subscribe((data: any[]) => {
       this.activities = data;
     });
-    this.service.reload(); // 👈 disparar la carga inicial
+    this.service.reload();
   }
 
   selectActivity(activity: any) {
@@ -44,9 +42,13 @@ export class ActivityListContainerComponent implements OnInit {
 
   stop(data: any) {
     this.service.stop(this.selected.id, { quantity: data.quantity })
-      .subscribe(() => {
-        alert('Finalizada');
-        this.selected = null;
+      .subscribe({
+        next: () => {
+          alert('Finalizada');
+          this.selected = null;
+          this.service.reload();
+        },
+        error: err => console.error('❌ Error al finalizar:', err)
       });
   }
 }

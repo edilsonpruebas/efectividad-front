@@ -1,15 +1,13 @@
-
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-activity-stop',
-  standalone: true,           // 👈 faltaba
+  standalone: true,
   imports: [FormsModule],
   templateUrl: './activity-stop.html',
   styleUrl: './activity-stop.css',
 })
-
 export class ActivityStopComponent {
 
   @Input() activity: any;
@@ -21,4 +19,3 @@ export class ActivityStopComponent {
     this.onConfirm.emit({ quantity: this.quantity });
   }
 }
-

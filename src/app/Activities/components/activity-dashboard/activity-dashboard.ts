@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf} from '@angular/common'; 
-import { DatePipe } from '@angular/common'; 
+import { NgFor, NgIf } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-activity-dashboard',
@@ -25,6 +25,7 @@ export class ActivityDashboardComponent {
   };
 
   quantities: any = {};
+  notes: any = {};
 
   start() {
     this.onStart.emit(this.form);
@@ -32,8 +33,9 @@ export class ActivityDashboardComponent {
 
   stop(activity: any) {
     this.onStop.emit({
-      id: activity.id,
-      quantity: this.quantities[activity.id]
+      id:       activity.id,
+      quantity: this.quantities[activity.id],
+      notes:    this.notes[activity.id] ?? ''
     });
   }
 }

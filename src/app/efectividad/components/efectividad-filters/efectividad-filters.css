@@ -59,3 +59,81 @@
 .btn-clear:hover {
   background: #fecaca;
 }
+
+.searchable-dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  background: white;
+  min-width: 180px;
+  user-select: none;
+}
+
+.dropdown-trigger:hover {
+  border-color: #888;
+}
+
+.arrow {
+  font-size: 10px;
+  color: #888;
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 100;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 220px;
+  padding: 8px;
+}
+
+.dropdown-panel input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.dropdown-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-panel ul li {
+  padding: 7px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.dropdown-panel ul li:hover {
+  background: #f0f4ff;
+}
+
+.no-results {
+  color: #aaa;
+  font-style: italic;
+  cursor: default !important;
+}
+
+.no-results:hover {
+  background: transparent !important;
+}

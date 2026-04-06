@@ -35,7 +35,6 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // 🔹 Operadores
     this.service.getOperators()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -43,7 +42,6 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
         error: (err) => console.error('Error operadores:', err)
       });
 
-    // 🔹 Procesos
     this.service.getProcesses()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -51,19 +49,14 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
         error: (err) => console.error('Error procesos:', err)
       });
 
-    // 🔹 Actividades en proceso (reactivo)
     this.service.activities$
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => this.activities = data);
 
-    // 🔥 Cargar historial
     this.loadHistory();
-
-    // 🔥 Cargar actividades activas
     this.service.reload();
   }
 
-  // 🔥 MÉTODO HISTORIAL
   loadHistory() {
     this.service.getHistory()
       .pipe(takeUntil(this.destroy$))
@@ -78,9 +71,7 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          console.log('✅ Actividad iniciada');
           this.service.reload();
-          // (no recargamos historial aquí porque aún no está cerrada)
         },
         error: err => console.error('❌ Error al iniciar:', err)
       });
@@ -91,10 +82,13 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          console.log('✅ Actividad finalizada');
 
-          this.service.reload();   // 🔄 actualiza activas
-          this.loadHistory();      // 🔥 actualiza historial
+          if (data.notes?.trim()) {
+            this.service.addNote(data.id, data.notes).subscribe();
+          }
+
+          this.service.reload();
+          this.loadHistory();
         },
         error: err => console.error('❌ Error al finalizar:', err)
       });

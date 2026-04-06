@@ -10,6 +10,7 @@
         <th>Duración (min)</th>
         <th>Cantidad</th>
         <th>Estado</th>
+        <th>Observaciones</th>
       </tr>
     </thead>
     <tbody>
@@ -19,35 +20,36 @@
         <td>{{ act.process?.name ?? '—' }}</td>
         <td>{{ act.start_time | date:'dd/MM/yyyy HH:mm' }}</td>
         <td>{{ act.end_time ? (act.end_time | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
-        <td>{{ act.duration_minutes ?? '—' }}</td>
+        <td>{{ durationMinutes(act) }}</td>
         <td>{{ act.quantity ?? '—' }}</td>
         <td>
           <span class="badge" [ngClass]="statusClass(act.status)">
             {{ statusLabel(act.status) }}
           </span>
         </td>
+        <td>{{ act.notes ?? '—' }}</td>
       </tr>
       <tr *ngIf="activities.length === 0">
-        <td colspan="8" class="empty">No hay registros para los filtros aplicados.</td>
+        <td colspan="9" class="empty">No hay registros para los filtros aplicados.</td>
       </tr>
     </tbody>
   </table>
-  
+
   <!-- Paginación -->
   <div class="pagination" *ngIf="totalPages > 1">
-    <button 
-      class="pagination-btn" 
+    <button
+      class="pagination-btn"
       [disabled]="currentPage === 1"
       (click)="goToPage(currentPage - 1)">
       ← Anterior
     </button>
-    
+
     <span class="pagination-info">
       Página {{ currentPage }} de {{ totalPages }}
     </span>
-    
-    <button 
-      class="pagination-btn" 
+
+    <button
+      class="pagination-btn"
       [disabled]="currentPage === totalPages"
       (click)="goToPage(currentPage + 1)">
       Siguiente →

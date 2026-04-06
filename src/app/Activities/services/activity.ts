@@ -59,4 +59,8 @@ export class ActivityService {
   
   }
   
+  addNote(id: number, notes: string) {
+  return this.http.post(`${this.api}/${id}/note`, { notes });
+}
+  
 }

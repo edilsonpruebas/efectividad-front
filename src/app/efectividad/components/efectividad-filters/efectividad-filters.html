@@ -10,20 +10,54 @@
     <input type="date" [(ngModel)]="filters.date_to" (change)="emit()" />
   </div>
 
-  <div class="filter-group">
+  <!-- OPERADOR -->
+  <div class="filter-group searchable-dropdown">
     <label>👤 Operador</label>
-    <select [(ngModel)]="filters.operator_id" (change)="emit()">
-      <option [ngValue]="null">Todos</option>
-      <option *ngFor="let op of operators" [ngValue]="op.id">{{ op.name }}</option>
-    </select>
+    <div class="dropdown-trigger" (click)="toggleOperator()">
+      <span>{{ operatorLabel }}</span>
+      <span class="arrow">{{ operatorOpen ? '▲' : '▼' }}</span>
+    </div>
+    <div class="dropdown-panel" *ngIf="operatorOpen">
+      <input
+        type="text"
+        [(ngModel)]="operatorSearch"
+        placeholder="Buscar operador..."
+        (click)="$event.stopPropagation()" />
+      <ul>
+        <li (click)="selectOperator(null, 'Todos')">Todos</li>
+        <li
+          *ngFor="let op of filteredOperators"
+          (click)="selectOperator(op.id, op.name)">
+          {{ op.name }}
+        </li>
+        <li *ngIf="filteredOperators.length === 0" class="no-results">Sin resultados</li>
+      </ul>
+    </div>
   </div>
 
-  <div class="filter-group">
+  <!-- PROCESO -->
+  <div class="filter-group searchable-dropdown">
     <label>⚙️ Proceso</label>
-    <select [(ngModel)]="filters.process_id" (change)="emit()">
-      <option [ngValue]="null">Todos</option>
-      <option *ngFor="let pr of processes" [ngValue]="pr.id">{{ pr.name }}</option>
-    </select>
+    <div class="dropdown-trigger" (click)="toggleProcess()">
+      <span>{{ processLabel }}</span>
+      <span class="arrow">{{ processOpen ? '▲' : '▼' }}</span>
+    </div>
+    <div class="dropdown-panel" *ngIf="processOpen">
+      <input
+        type="text"
+        [(ngModel)]="processSearch"
+        placeholder="Buscar proceso..."
+        (click)="$event.stopPropagation()" />
+      <ul>
+        <li (click)="selectProcess(null, 'Todos')">Todos</li>
+        <li
+          *ngFor="let pr of filteredProcesses"
+          (click)="selectProcess(pr.id, pr.name)">
+          {{ pr.name }}
+        </li>
+        <li *ngIf="filteredProcesses.length === 0" class="no-results">Sin resultados</li>
+      </ul>
+    </div>
   </div>
 
   <button class="btn-clear" (click)="clear()">✖ Limpiar</button>
