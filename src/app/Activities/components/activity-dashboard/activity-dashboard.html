@@ -2,35 +2,77 @@
 
   <!-- PANEL IZQUIERDO -->
   <div class="panel start-panel">
-    <div class="panel-header">
-      <h2>🚀 Iniciar Actividad</h2>
-      <p class="panel-subtitle">Registra una nueva tarea de producción</p>
-    </div>
+    
+    <!-- 🔥 NUEVO WRAPPER PARA SCROLL -->
+    <div class="start-panel-inner">
 
-    <div class="form-group">
-      <label>👤 Operador</label>
-      <select [(ngModel)]="form.operator_id">
-        <option [ngValue]="null" disabled selected>Seleccionar operador...</option>
-        <option *ngFor="let op of operators" [value]="op.id">
-          {{op.name}}
-        </option>
-      </select>
-    </div>
+      <div class="panel-header">
+        <h2>🚀 Iniciar Actividad</h2>
+        <p class="panel-subtitle">Registra una nueva tarea de producción</p>
+      </div>
 
-    <div class="form-group">
-      <label>⚙️ Proceso</label>
-      <select [(ngModel)]="form.process_id">
-        <option [ngValue]="null" disabled selected>Seleccionar proceso...</option>
-        <option *ngFor="let pr of processes" [value]="pr.id">
-          {{pr.name}}
-        </option>
-      </select>
-    </div>
+      <!-- 🔍 OPERADOR -->
+      <div class="form-group searchable-dropdown"
+     [class.active]="operatorOpen">
+        <label>👤 Operador</label>
+        <div class="dropdown-trigger" (click)="toggleOperator()">
+          <span>{{ operatorLabel }}</span>
+          <span class="arrow">{{ operatorOpen ? '▲' : '▼' }}</span>
+        </div>
+        <div class="dropdown-panel" *ngIf="operatorOpen">
+          <input
+            type="text"
+            [(ngModel)]="operatorSearch"
+            placeholder="Buscar operador..."
+            autocomplete="off"
+            (click)="$event.stopPropagation()" />
+          <ul>
+            <li (click)="selectOperator(null, 'Seleccionar operador...')">Todos</li>
+            <li *ngFor="let op of filteredOperators"
+                (click)="selectOperator(op.id, op.name)">
+              {{ op.name }}
+            </li>
+            <li *ngIf="filteredOperators.length === 0" class="no-results">
+              Sin resultados
+            </li>
+          </ul>
+        </div>
+      </div>
 
-    <button (click)="start()" class="btn btn-start">
-      <span class="btn-icon">▶</span>
-      <span>Iniciar Producción</span>
-    </button>
+      <!-- 🔍 PROCESO -->
+      <div class="form-group searchable-dropdown"
+     [class.active]="processOpen">
+        <label>⚙️ Proceso</label>
+        <div class="dropdown-trigger" (click)="toggleProcess()">
+          <span>{{ processLabel }}</span>
+          <span class="arrow">{{ processOpen ? '▲' : '▼' }}</span>
+        </div>
+        <div class="dropdown-panel" *ngIf="processOpen">
+          <input
+            type="text"
+            [(ngModel)]="processSearch"
+            placeholder="Buscar proceso..."
+            autocomplete="off"
+            (click)="$event.stopPropagation()" />
+          <ul>
+            <li (click)="selectProcess(null, 'Seleccionar proceso...')">Todos</li>
+            <li *ngFor="let pr of filteredProcesses"
+                (click)="selectProcess(pr.id, pr.name)">
+              {{ pr.name }}
+            </li>
+            <li *ngIf="filteredProcesses.length === 0" class="no-results">
+              Sin resultados
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <button (click)="start()" class="btn btn-start">
+        <span class="btn-icon">▶</span>
+        <span>Iniciar Producción</span>
+      </button>
+
+    </div>
   </div>
 
   <!-- PANEL DERECHO -->
@@ -48,7 +90,9 @@
       <span>Inicia una nueva actividad desde el panel izquierdo</span>
     </div>
 
-    <div *ngFor="let act of activities; let i = index" class="card" [style.animation-delay]="i * 0.1 + 's'">
+    <div *ngFor="let act of activities; let i = index"
+         class="card"
+         [style.animation-delay]="i * 0.1 + 's'">
 
       <div class="card-info">
         <div class="name">{{act.operator.name}}</div>
@@ -91,7 +135,6 @@
       </div>
 
     </div>
-
   </div>
 
 </div>
