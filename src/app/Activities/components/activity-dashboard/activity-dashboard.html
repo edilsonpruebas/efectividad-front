@@ -2,8 +2,6 @@
 
   <!-- PANEL IZQUIERDO -->
   <div class="panel start-panel">
-    
-    <!-- 🔥 NUEVO WRAPPER PARA SCROLL -->
     <div class="start-panel-inner">
 
       <div class="panel-header">
@@ -11,58 +9,44 @@
         <p class="panel-subtitle">Registra una nueva tarea de producción</p>
       </div>
 
-      <!-- 🔍 OPERADOR -->
-      <div class="form-group searchable-dropdown"
-     [class.active]="operatorOpen">
+      <!-- OPERADOR -->
+      <div class="form-group searchable-dropdown" [class.active]="operatorOpen">
         <label>👤 Operador</label>
         <div class="dropdown-trigger" (click)="toggleOperator()">
           <span>{{ operatorLabel }}</span>
           <span class="arrow">{{ operatorOpen ? '▲' : '▼' }}</span>
         </div>
         <div class="dropdown-panel" *ngIf="operatorOpen">
-          <input
-            type="text"
-            [(ngModel)]="operatorSearch"
-            placeholder="Buscar operador..."
-            autocomplete="off"
-            (click)="$event.stopPropagation()" />
+          <input type="text" [(ngModel)]="operatorSearch"
+                 placeholder="Buscar operador..." autocomplete="off"
+                 (click)="$event.stopPropagation()" />
           <ul>
             <li (click)="selectOperator(null, 'Seleccionar operador...')">Todos</li>
-            <li *ngFor="let op of filteredOperators"
-                (click)="selectOperator(op.id, op.name)">
+            <li *ngFor="let op of filteredOperators" (click)="selectOperator(op.id, op.name)">
               {{ op.name }}
             </li>
-            <li *ngIf="filteredOperators.length === 0" class="no-results">
-              Sin resultados
-            </li>
+            <li *ngIf="filteredOperators.length === 0" class="no-results">Sin resultados</li>
           </ul>
         </div>
       </div>
 
-      <!-- 🔍 PROCESO -->
-      <div class="form-group searchable-dropdown"
-     [class.active]="processOpen">
+      <!-- PROCESO -->
+      <div class="form-group searchable-dropdown" [class.active]="processOpen">
         <label>⚙️ Proceso</label>
         <div class="dropdown-trigger" (click)="toggleProcess()">
           <span>{{ processLabel }}</span>
           <span class="arrow">{{ processOpen ? '▲' : '▼' }}</span>
         </div>
         <div class="dropdown-panel" *ngIf="processOpen">
-          <input
-            type="text"
-            [(ngModel)]="processSearch"
-            placeholder="Buscar proceso..."
-            autocomplete="off"
-            (click)="$event.stopPropagation()" />
+          <input type="text" [(ngModel)]="processSearch"
+                 placeholder="Buscar proceso..." autocomplete="off"
+                 (click)="$event.stopPropagation()" />
           <ul>
             <li (click)="selectProcess(null, 'Seleccionar proceso...')">Todos</li>
-            <li *ngFor="let pr of filteredProcesses"
-                (click)="selectProcess(pr.id, pr.name)">
+            <li *ngFor="let pr of filteredProcesses" (click)="selectProcess(pr.id, pr.name)">
               {{ pr.name }}
             </li>
-            <li *ngIf="filteredProcesses.length === 0" class="no-results">
-              Sin resultados
-            </li>
+            <li *ngIf="filteredProcesses.length === 0" class="no-results">Sin resultados</li>
           </ul>
         </div>
       </div>
@@ -80,7 +64,7 @@
     <div class="panel-header">
       <h2>📋 Actividades en Proceso</h2>
       <span class="badge-count" *ngIf="activities.length > 0">
-        {{activities.length}} activas
+        {{ activities.length }} activas
       </span>
     </div>
 
@@ -95,45 +79,89 @@
          [style.animation-delay]="i * 0.1 + 's'">
 
       <div class="card-info">
-        <div class="name">{{act.operator.name}}</div>
+        <div class="name">{{ act.operator.name }}</div>
         <div class="process">
           <span class="process-dot"></span>
-          {{act.process.name}}
+          {{ act.process.name }}
           <span class="base-rate" *ngIf="act.process?.base_per_hour">
-            • {{act.process.base_per_hour}} uds/hr
+            • {{ act.process.base_per_hour }} uds/hr
           </span>
         </div>
         <div class="time">
           <span class="time-icon">🕐</span>
-          {{act.start_time | date:'shortTime'}} -
-          <span class="duration">En curso</span>
+          {{ act.start_time | date:'shortTime' }} —
+          <span class="duration" *ngIf="act.status === 'OPEN'">En curso</span>
+          <span class="duration" *ngIf="act.status === 'STOPPED'">
+            Detenido a las {{ act.end_time | date:'shortTime' }}
+          </span>
         </div>
       </div>
 
       <div class="card-actions">
-        <div class="input-group">
-          <label class="input-label">Cantidad</label>
-          <input type="number"
-                 [(ngModel)]="quantities[act.id]"
-                 placeholder="0"
-                 min="0">
-        </div>
 
-        <div class="input-group">
-          <label class="input-label">Observaciones</label>
-          <textarea
-            [(ngModel)]="notes[act.id]"
-            placeholder="Opcional..."
-            rows="2">
-          </textarea>
-        </div>
+        <!-- ── ESTADO: OPEN ── -->
+        <ng-container *ngIf="act.status === 'OPEN'">
+          <div class="card-form">
+            <div class="card-inputs-row">
+              <div class="input-group">
+                <label class="input-label">Cantidad</label>
+                <input type="number"
+                       [(ngModel)]="quantities[act.id]"
+                       placeholder="0"
+                       min="0">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Observaciones</label>
+                <input type="text"
+                       [(ngModel)]="notes[act.id]"
+                       placeholder="Opcional...">
+              </div>
+            </div>
+            <div class="card-buttons-row">
+              <button (click)="cancel(act)" class="btn btn-cancel">
+                <span class="btn-icon">✖</span>
+                <span>Cancelar</span>
+              </button>
+              <button (click)="stopTimer(act)" class="btn btn-stop-timer">
+                <span class="btn-icon">⏹</span>
+                <span>Terminar</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
 
-        <button (click)="stop(act)" class="btn btn-stop">
-          <span class="btn-icon">✔</span>
-          <span>Finalizar</span>
-        </button>
+        <!-- ── ESTADO: STOPPED ── -->
+        <ng-container *ngIf="act.status === 'STOPPED'">
+          <div class="card-form">
+            <div class="card-inputs-row">
+              <div class="input-group">
+                <label class="input-label">Cantidad</label>
+                <input type="number"
+                       [(ngModel)]="quantities[act.id]"
+                       placeholder="0"
+                       min="0">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Observaciones</label>
+                <input type="text"
+                       [(ngModel)]="notes[act.id]"
+                       placeholder="Opcional...">
+              </div>
+            </div>
+            <div class="card-buttons-row">
+              <button (click)="cancel(act)" class="btn btn-cancel">
+                <span class="btn-icon">✖</span>
+                <span>Cancelar</span>
+              </button>
+              <button (click)="submitReport(act)" class="btn btn-stop">
+                <span class="btn-icon">✔</span>
+                <span>Enviar Reporte</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
       </div>
-
     </div>
   </div>
 

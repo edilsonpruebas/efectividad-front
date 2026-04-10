@@ -373,3 +373,150 @@ input[type="number"] {
   flex-direction: column;
   gap: 2px;
 }
+
+/* ===== BOTONES DE ACCIÓN EN CARDS ===== */
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-stop-timer {
+  background: #f59e0b;
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  width: auto;
+  padding: 10px 16px;
+}
+
+.btn-stop-timer:hover {
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+}
+
+.btn-cancel {
+  background: #64748b;
+  color: white;
+  box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
+  width: auto;
+  padding: 10px 16px;
+}
+
+.btn-cancel:hover {
+  box-shadow: 0 8px 25px rgba(100, 116, 139, 0.5);
+}
+
+/* ===== CARD ACTIONS VERTICAL ===== */
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 13px;
+  resize: none;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+/* ===== BADGE DE ESTADO ===== */
+
+.status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-top: 6px;
+  width: fit-content;
+}
+
+.badge-open {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge-stopped {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
+/* ===== DURACIÓN DETENIDA ===== */
+
+.duration.stopped {
+  color: #ca8a04;
+}
+
+/* ===== CARD FORM COMPACTO ===== */
+
+.card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 280px;
+}
+
+.card-inputs-row {
+  display: flex;
+  gap: 10px;
+}
+
+.card-inputs-row .input-group {
+  flex: 1;
+}
+
+.card-inputs-row .input-group input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 13px;
+}
+
+.card-inputs-row .input-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+.card-buttons-row {
+  display: flex;
+  gap: 8px;
+}
+
+.card-buttons-row .btn {
+  flex: 1;
+  margin-top: 0;
+  padding: 9px 12px;
+  font-size: 13px;
+}

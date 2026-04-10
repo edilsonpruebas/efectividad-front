@@ -16,27 +16,28 @@ export class ActivityDashboardComponent {
   @Input() operators: any[] = [];
   @Input() processes: any[] = [];
 
-  @Output() onStart = new EventEmitter<any>();
-  @Output() onStop = new EventEmitter<any>();
+  @Output() onStart        = new EventEmitter<any>();
+  @Output() onStop         = new EventEmitter<any>();
+  @Output() onStopTimer    = new EventEmitter<any>();
+  @Output() onSubmitReport = new EventEmitter<any>();
+  @Output() onQuickReport  = new EventEmitter<any>();
+  @Output() onCancel       = new EventEmitter<any>();
 
-
-form: { process_id: number | null; operator_id: number | null } = {
-  process_id: null,
-  operator_id: null
-};
+  form: { process_id: number | null; operator_id: number | null } = {
+    process_id: null,
+    operator_id: null
+  };
 
   quantities: any = {};
   notes: any = {};
 
-  // 🔍 Estado de los dropdowns personalizados
   operatorSearch: string = '';
-  processSearch: string = '';
-  operatorOpen: boolean = false;
-  processOpen: boolean = false;
-  operatorLabel: string = 'Seleccionar operador...';
-  processLabel: string = 'Seleccionar proceso...';
+  processSearch: string  = '';
+  operatorOpen: boolean  = false;
+  processOpen: boolean   = false;
+  operatorLabel: string  = 'Seleccionar operador...';
+  processLabel: string   = 'Seleccionar proceso...';
 
-  // 🔍 Filtros dinámicos
   get filteredOperators() {
     if (!this.operatorSearch) return this.operators;
     const search = this.operatorSearch.toLowerCase();
@@ -49,40 +50,33 @@ form: { process_id: number | null; operator_id: number | null } = {
     return this.processes.filter(pr => pr.name?.toLowerCase().includes(search));
   }
 
-  // 🔍 Control de apertura/cierre y selección
   toggleOperator() {
     this.operatorOpen = !this.operatorOpen;
-    if (this.operatorOpen) {
-      this.processOpen = false;
-      this.operatorSearch = '';
-    }
+    if (this.operatorOpen) { this.processOpen = false; this.operatorSearch = ''; }
   }
 
   toggleProcess() {
     this.processOpen = !this.processOpen;
-    if (this.processOpen) {
-      this.operatorOpen = false;
-      this.processSearch = '';
-    }
+    if (this.processOpen) { this.operatorOpen = false; this.processSearch = ''; }
   }
 
   selectOperator(id: number | null, name: string) {
     this.form.operator_id = id;
-    this.operatorLabel = name;
-    this.operatorOpen = false;
+    this.operatorLabel    = name;
+    this.operatorOpen     = false;
   }
 
   selectProcess(id: number | null, name: string) {
     this.form.process_id = id;
-    this.processLabel = name;
-    this.processOpen = false;
+    this.processLabel    = name;
+    this.processOpen     = false;
   }
 
-  // ✅ LÓGICA ORIGINAL INTACTA
   start() {
     this.onStart.emit(this.form);
   }
 
+  // Legacy — por si se usa en otro lado
   stop(activity: any) {
     this.onStop.emit({
       id:       activity.id,
@@ -90,4 +84,30 @@ form: { process_id: number | null; operator_id: number | null } = {
       notes:    this.notes[activity.id] ?? ''
     });
   }
+
+  stopTimer(activity: any) {
+    this.onStopTimer.emit({ id: activity.id });
+  }
+
+  submitReport(activity: any) {
+    this.onSubmitReport.emit({
+      id:       activity.id,
+      quantity: this.quantities[activity.id],
+      notes:    this.notes[activity.id] ?? ''
+    });
+  }
+
+  quickReport() {
+    this.onQuickReport.emit({
+      operator_id: this.form.operator_id,
+      process_id:  this.form.process_id,
+      quantity:    this.quantities['quick'] ?? 0,
+      notes:       this.notes['quick'] ?? ''
+    });
+  }
+
+
+cancel(activity: any) {
+  this.onCancel.emit({ id: activity.id });
+}
 }

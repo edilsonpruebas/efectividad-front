@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +41,9 @@ export class ActivityService {
     return this.http.post(`${this.api}/${id}/stop`, data);
   }
 
+  cancel(id: number) {
+  return this.http.post(`${this.api}/${id}/cancel`, {});
+  }
   getOperators() {
     return this.http.get<any[]>('http://localhost:8000/api/operators');
   }
@@ -61,6 +64,20 @@ export class ActivityService {
   
   addNote(id: number, notes: string) {
   return this.http.post(`${this.api}/${id}/note`, { notes });
+
+  
+}
+
+stopTimer(id: number): Observable<any> {
+  return this.http.post(`${this.api}/activities/${id}/stop-timer`, {});
+}
+
+submitReport(id: number, data: { quantity: number; notes?: string }): Observable<any> {
+  return this.http.post(`${this.api}/activities/${id}/submit-report`, data);
+}
+
+quickReport(data: { operator_id: number; process_id: number; quantity: number; notes?: string }): Observable<any> {
+  return this.http.post(`${this.api}/activities/quick-report`, data);
 }
   
 }

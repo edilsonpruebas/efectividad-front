@@ -44,8 +44,8 @@
           <tr>
             <td class="text-center">
               <button class="btn-expand"
-                      (click)="op.expanded = !op.expanded">
-                {{ op.expanded ? '−' : '+' }}
+                      (click)="toggleExpanded(op)">
+                {{ isExpanded(op) ? '−' : '+' }}
               </button>
             </td>
 
@@ -61,7 +61,7 @@
               {{ op.total_time || '—' }}
             </td>
 
-            <td class="text-right">{{ op.total_standard }}</td>
+            <td class="text-right">{{ op.total_standard | number:'1.0-2' }}</td>
             <td class="text-right">{{ op.total_real }}</td>
 
             <!-- 🔥 EFECTIVIDAD PONDERADA -->
@@ -82,7 +82,7 @@
           </tr>
 
           <!-- DETALLE -->
-          <tr *ngIf="op.expanded" class="detail-row">
+          <tr *ngIf="isExpanded(op)" class="detail-row">
             <td colspan="7">
               <div class="detail-container">
 
@@ -108,58 +108,12 @@
                       <tr *ngFor="let act of op.activities">
                         <td class="text-left">{{ act.name }}</td>
                         <td class="text-center">{{ act.time }}</td>
-                        <td class="text-right">{{ act.standard }}</td>
+                        <td class="text-right">{{ act.standard | number:'1.0-2' }}</td>
                         <td class="text-right">{{ act.real }}</td>
                         <td class="text-center">{{ act.effectiveness }}%</td>
                       </tr>
                     </tbody>
                   </table>
-                </div>
-
-                <!-- RESUMEN -->
-                <div class="summary-box">
-
-                  <div class="row">
-                    <th>EFECTIVIDAD MULTIACTIVIDAD</th>
-                  </div>
-
-                  <div class="row">
-                    <span>Σ Cantidad esperada</span>
-                    <strong>{{ op.total_standard }}</strong>
-                  </div>
-
-                  <div class="row">
-                    <span>Σ Real</span>
-                    <strong>{{ op.total_real }}</strong>
-                  </div>
-
-                  <div class="row">
-                    <span>Actividades</span>
-                    <strong>{{ op.activities_count }}</strong>
-                  </div>
-
-                  <div class="row">
-                    <span>Efectividad</span>
-                    <strong>{{ badgeLabel(op.effectiveness) }}</strong>
-                  </div>
-
-                  <!-- 🔥 EFECTIVIDAD PONDERADA -->
-                  <div class="row">
-                    <th>EFECTIVIDAD PONDERADA</th>
-                  </div>
-
-                  <div class="row">
-                    <span>Ponderada</span>
-                    <strong>{{ badgeLabel(op.weighted_effectiveness) }}</strong>
-                  </div>
-
-                  <div class="progress-bar-wrapper small">
-                    <div class="progress-bar"
-                         [ngClass]="badgeClass(op.weighted_effectiveness)"
-                         [style.width.%]="op.weighted_effectiveness || 0">
-                    </div>
-                  </div>
-
                 </div>
 
               </div>
@@ -202,7 +156,6 @@
   </div>
 
   <div *ngIf="effectiveness.by_process.length > 0">
-    <!-- TABLA CON MISMO ESTILO QUE OPERADORES -->
     <table class="operator-table">
       <thead>
         <tr>
@@ -239,7 +192,7 @@
               {{ pr.activities_count }}
             </span>
           </td>
-          <td class="text-right">{{ pr.total_standard | number:'1.0-0' }}</td>
+          <td class="text-right">{{ pr.total_standard | number:'1.0-2' }}</td>
           <td class="text-right">{{ pr.total_real }}</td>
           <td class="text-center">
             <div class="effectiveness-cell">

@@ -33,14 +33,26 @@
           <span class="nav-icon">📊</span>
           <span class="nav-label" *ngIf="sidebarOpen">Efectividad</span>
         </a>
+
+        <a routerLink="/reports/manual"
+           routerLinkActive="active"
+           class="nav-item">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label" *ngIf="sidebarOpen">Reporte Manual</span>
+        </a>
       </div>
 
-      <a routerLink="/reports/manual"
-     routerLinkActive="active"
-     class="nav-item">
-    <span class="nav-icon">📝</span>
-    <span class="nav-label" *ngIf="sidebarOpen">Reporte Manual</span>
-  </a>
+      <!-- ✅ NUEVA SECCIÓN: ADMINISTRACIÓN -->
+      <div class="nav-section" *ngIf="sidebarOpen">
+        <span class="nav-section-label">Administración</span>
+
+        <a routerLink="/admin/efectividad"
+           routerLinkActive="active"
+           class="nav-item">
+          <span class="nav-icon">🔧</span>
+          <span class="nav-label">Operadores y Procesos</span>
+        </a>
+      </div>
 
     </nav>
 

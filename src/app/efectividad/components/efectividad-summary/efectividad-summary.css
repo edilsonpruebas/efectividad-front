@@ -219,3 +219,13 @@
 .progress-bar-wrapper.small {
   width: 80px;
 }
+
+.activities-table th,
+.activities-table td {
+  text-align: center;
+}
+
+.activities-table th.text-left,
+.activities-table td.text-left {
+  text-align: left;
+}

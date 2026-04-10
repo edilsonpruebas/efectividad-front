@@ -5,6 +5,8 @@ import { ActivityStartContainerComponent } from './Activities/pages/activity-sta
 import { ActivityDashboardContainerComponent } from './Activities/pages/activity-dashboard-container/activity-dashboard-container';
 import { EfectividadDashboardContainerComponent } from './efectividad/pages/efectividad-dashboard-container/efectividad-dashboard-container';
 import { ManualReportContainerComponent } from './Activities/pages/manual-report-container/manual-report-container';
+// ✅ NUEVO IMPORT: Contenedor del módulo administrativo
+import { EfectividadAdminContainerComponent } from './efectividad/pages/efectividad-admin-container/efectividad-admin-container';
 
 export const routes: Routes = [
   {
@@ -16,6 +18,8 @@ export const routes: Routes = [
       { path: 'activities',          component: ActivityListContainerComponent },
       { path: 'reports/efectividad', component: EfectividadDashboardContainerComponent },
       { path: 'reports/manual',      component: ManualReportContainerComponent },
+      // ✅ NUEVA RUTA: Módulo administrativo independiente
+      { path: 'admin/efectividad',   component: EfectividadAdminContainerComponent }
     ]
   }
 ];

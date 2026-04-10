@@ -14,8 +14,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let act of paginatedActivities">
-        <td>{{ act.id }}</td>
+     <tr *ngFor="let act of paginatedActivities; let i = index; trackBy: trackByFn">
+        <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
         <td>{{ act.operator?.name ?? '—' }}</td>
         <td>{{ act.process?.name ?? '—' }}</td>
         <td>{{ act.start_time | date:'dd/MM/yyyy HH:mm' }}</td>
