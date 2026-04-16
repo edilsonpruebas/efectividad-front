@@ -9,12 +9,13 @@
   </div>
 
   <!-- Alertas -->
-  <div class="alert alert-success" *ngIf="success" @fadeIn>
+  <div class="alert alert-success" *ngIf="success">
+
     <span class="alert-icon">✅</span>
     <span>Reporte registrado correctamente</span>
   </div>
 
-  <div class="alert alert-error" *ngIf="error" @fadeIn>
+  <div class="alert alert-error" *ngIf="error">
     <span class="alert-icon">⚠️</span>
     <span>{{ error }}</span>
   </div>
@@ -29,53 +30,87 @@
       </div>
       
       <div class="form-row">
-        <!-- Operador con búsqueda -->
+        <!-- Operador: Dropdown personalizado con búsqueda -->
         <div class="form-group required">
           <label>
             Operador responsable
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
-          <div class="select-with-search">
-            <div class="search-box">
-              <input 
-                type="text" 
-                placeholder="🔍 Buscar operador..." 
-                [(ngModel)]="operatorSearchTerm"
-                class="search-input"
-              />
+          
+          <!-- Dropdown para operador -->
+          <div class="custom-select" [class.open]="operatorDropdownOpen" (clickOutside)="operatorDropdownOpen = false">
+            <div class="select-display" (click)="toggleOperatorDropdown()">
+              <span class="selected-text" [class.placeholder]="!selectedOperatorName">
+                {{ selectedOperatorName || 'Seleccionar operador...' }}
+              </span>
+              <span class="dropdown-arrow">▼</span>
             </div>
-            <div class="input-wrapper">
-              <select [(ngModel)]="form.operator_id" [class.filled]="form.operator_id">
-                <option [ngValue]="null" disabled>Seleccionar operador...</option>
-                <option *ngFor="let op of filteredOperators" [value]="op.id">{{ op.name }}</option>
-              </select>
-              <span class="input-icon">▼</span>
+            
+            <div class="dropdown-menu" *ngIf="operatorDropdownOpen">
+              <div class="dropdown-search">
+                <input 
+                  type="text" 
+                  placeholder="🔍 Buscar operador..." 
+                  [(ngModel)]="operatorSearchTerm"
+                  (click)="$event.stopPropagation()"
+                  class="search-input"
+                />
+              </div>
+              <ul class="options-list">
+                <li 
+                  *ngFor="let op of filteredOperators" 
+                  (click)="selectOperator(op)"
+                  [class.selected]="form.operator_id === op.id"
+                >
+                  {{ op.name }}
+                </li>
+                <li class="no-results" *ngIf="filteredOperators.length === 0">
+                  No se encontraron operadores
+                </li>
+              </ul>
             </div>
           </div>
+          
           <span class="hint">Selecciona el operador que realizó la actividad</span>
         </div>
 
-        <!-- Proceso con búsqueda -->
+        <!-- Proceso: Dropdown personalizado con búsqueda -->
         <div class="form-group required">
           <label>
             Proceso ejecutado
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
-          <div class="select-with-search">
-            <div class="search-box">
-              <input 
-                type="text" 
-                placeholder="🔍 Buscar proceso..." 
-                [(ngModel)]="processSearchTerm"
-                class="search-input"
-              />
+          
+          <div class="custom-select" [class.open]="processDropdownOpen" (clickOutside)="processDropdownOpen = false">
+            <div class="select-display" (click)="toggleProcessDropdown()">
+              <span class="selected-text" [class.placeholder]="!selectedProcessName">
+                {{ selectedProcessName || 'Seleccionar proceso...' }}
+              </span>
+              <span class="dropdown-arrow">▼</span>
             </div>
-            <div class="input-wrapper">
-              <select [(ngModel)]="form.process_id" [class.filled]="form.process_id">
-                <option [ngValue]="null" disabled>Seleccionar proceso...</option>
-                <option *ngFor="let pr of filteredProcesses" [value]="pr.id">{{ pr.name }}</option>
-              </select>
-              <span class="input-icon">▼</span>
+            
+            <div class="dropdown-menu" *ngIf="processDropdownOpen">
+              <div class="dropdown-search">
+                <input 
+                  type="text" 
+                  placeholder="🔍 Buscar proceso..." 
+                  [(ngModel)]="processSearchTerm"
+                  (click)="$event.stopPropagation()"
+                  class="search-input"
+                />
+              </div>
+              <ul class="options-list">
+                <li 
+                  *ngFor="let pr of filteredProcesses" 
+                  (click)="selectProcess(pr)"
+                  [class.selected]="form.process_id === pr.id"
+                >
+                  {{ pr.name }}
+                </li>
+                <li class="no-results" *ngIf="filteredProcesses.length === 0">
+                  No se encontraron procesos
+                </li>
+              </ul>
             </div>
           </div>
         </div>

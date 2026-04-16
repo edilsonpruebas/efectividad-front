@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
-import { Directive, ElementRef, HostListener,  } from '@angular/core';
+import { Directive, ElementRef, HostListener } from '@angular/core';
 
 @Directive({
   selector: '[clickOutside]',
@@ -38,15 +38,12 @@ export class ManualReportComponent {
   error   = '';
   loading = false;
 
-  // Control de dropdowns
   operatorDropdownOpen = false;
   processDropdownOpen = false;
 
-  // Términos de búsqueda
   operatorSearchTerm = '';
   processSearchTerm = '';
 
-  // Timeout de seguridad para estado de carga
   private loadingTimeout: any;
 
   form = {
@@ -59,7 +56,6 @@ export class ManualReportComponent {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  // --- Getters para filtrado ---
   get filteredOperators() {
     if (!this.operatorSearchTerm) return this.operators;
     const term = this.operatorSearchTerm.toLowerCase();
@@ -72,7 +68,6 @@ export class ManualReportComponent {
     return this.processes.filter(pr => pr.name.toLowerCase().includes(term));
   }
 
-  // --- Nombres para mostrar en el botón del dropdown ---
   get selectedOperatorName(): string {
     const op = this.operators.find(o => o.id === this.form.operator_id);
     return op ? op.name : '';
@@ -83,64 +78,57 @@ export class ManualReportComponent {
     return pr ? pr.name : '';
   }
 
-  // --- Métodos para dropdowns ---
   toggleOperatorDropdown() {
     this.operatorDropdownOpen = !this.operatorDropdownOpen;
     this.processDropdownOpen = false;
-    if (this.operatorDropdownOpen) {
-      this.operatorSearchTerm = '';
-    }
+    if (this.operatorDropdownOpen) this.operatorSearchTerm = '';
   }
 
   toggleProcessDropdown() {
     this.processDropdownOpen = !this.processDropdownOpen;
     this.operatorDropdownOpen = false;
-    if (this.processDropdownOpen) {
-      this.processSearchTerm = '';
-    }
+    if (this.processDropdownOpen) this.processSearchTerm = '';
   }
 
   selectOperator(op: any) {
     this.form.operator_id = op.id;
     this.operatorDropdownOpen = false;
     this.operatorSearchTerm = '';
-    this.cdr.detectChanges(); // Actualiza clase 'filled'
+    this.cdr.markForCheck(); // ← corregido
   }
 
   selectProcess(pr: any) {
     this.form.process_id = pr.id;
     this.processDropdownOpen = false;
     this.processSearchTerm = '';
-    this.cdr.detectChanges();
+    this.cdr.markForCheck(); // ← corregido
   }
 
-  // --- Validación y duración (sin cambios) ---
   isFormValid(): boolean {
-    return !!this.form.operator_id && 
-           !!this.form.process_id && 
-           !!this.form.start_time && 
-           !!this.form.end_time && 
-           !!this.form.quantity && 
+    return !!this.form.operator_id &&
+           !!this.form.process_id &&
+           !!this.form.start_time &&
+           !!this.form.end_time &&
+           !!this.form.quantity &&
            this.form.quantity > 0;
   }
 
   calculateDuration(): string {
     if (!this.form.start_time || !this.form.end_time) return '';
-    
+
     const start = new Date(this.form.start_time);
     const end = new Date(this.form.end_time);
     const diffMinutes = (end.getTime() - start.getTime()) / 1000 / 60;
-    
+
     if (diffMinutes < 0) return 'Verificar fechas';
     if (diffMinutes === 0) return '0 minutos';
     if (diffMinutes < 60) return `${Math.round(diffMinutes)} minutos`;
-    
+
     const hours = Math.floor(diffMinutes / 60);
     const mins = Math.round(diffMinutes % 60);
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
   }
 
-  // --- Envío del formulario ---
   submit() {
     this.success = false;
     this.error   = '';
@@ -149,56 +137,54 @@ export class ManualReportComponent {
         !this.form.start_time  || !this.form.end_time   ||
         this.form.quantity === null) {
       this.error = 'Todos los campos son obligatorios.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck(); // ← corregido
       return;
     }
 
     if (new Date(this.form.end_time) <= new Date(this.form.start_time)) {
       this.error = 'La hora final debe ser posterior a la hora de inicio.';
-      this.cdr.detectChanges();
+      this.cdr.markForCheck(); // ← corregido
       return;
     }
 
     this.loading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck(); // ← corregido
 
-    // Timeout de seguridad: 10 segundos
     this.loadingTimeout = setTimeout(() => {
       if (this.loading) {
         this.loading = false;
         this.error = 'La operación está tomando más tiempo de lo esperado. Intente nuevamente.';
-        this.cdr.detectChanges();
+        this.cdr.markForCheck(); // ← corregido
       }
     }, 10000);
 
     this.onSubmit.emit({ ...this.form });
   }
 
-  // --- Métodos llamados por el padre ---
   markSuccess() {
-    this.clearLoadingTimeout();
-    this.loading = false;
-    this.success = true;
-    this.form = {
-      operator_id: null,
-      process_id:  null,
-      start_time:  '',
-      end_time:    '',
-      quantity:    null
-    };
-    // Limpiar estados de dropdown y búsqueda
-    this.operatorDropdownOpen = false;
-    this.processDropdownOpen = false;
-    this.operatorSearchTerm = '';
-    this.processSearchTerm = '';
-    this.cdr.detectChanges(); // <-- Forzar actualización de vista
-  }
+  this.clearLoadingTimeout();
+  this.loading = false;
+  this.success = true;
+  console.log('markSuccess ejecutado - loading:', this.loading, 'success:', this.success);
+  this.form = {
+    operator_id: null,
+    process_id:  null,
+    start_time:  '',
+    end_time:    '',
+    quantity:    null
+  };
+  this.operatorDropdownOpen = false;
+  this.processDropdownOpen = false;
+  this.operatorSearchTerm = '';
+  this.processSearchTerm = '';
+  this.cdr.markForCheck();
+}
 
   markError(msg: string) {
     this.clearLoadingTimeout();
     this.loading = false;
-    this.error   = msg;
-    this.cdr.detectChanges(); // <-- Forzar actualización de vista
+    this.error = msg;
+    this.cdr.markForCheck(); // ← corregido
   }
 
   private clearLoadingTimeout() {

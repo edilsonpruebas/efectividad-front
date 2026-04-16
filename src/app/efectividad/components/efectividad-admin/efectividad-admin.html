@@ -50,7 +50,6 @@
           <button class="btn-toggle" (click)="toggleOperator.emit(op.id)">
             {{ op.is_active ? 'Desactivar' : 'Activar' }}
           </button>
-          <button class="btn-delete" (click)="askDelete(op.id, 'operator')">Eliminar</button>
         </div>
       </div>
       <div class="empty" *ngIf="filteredOperators.length === 0">
@@ -119,7 +118,6 @@
           <button class="btn-toggle" (click)="toggleProcess.emit(pr.id)">
             {{ pr.is_active ? 'Desactivar' : 'Activar' }}
           </button>
-          <button class="btn-delete" (click)="askDelete(pr.id, 'process')">Eliminar</button>
         </div>
       </div>
       <div class="empty" *ngIf="filteredProcesses.length === 0">
@@ -146,18 +144,6 @@
         [style.opacity]="currentPage === totalProcessPages ? '0.5' : '1'">
         Siguiente →
       </button>
-    </div>
-  </div>
-
-  <!-- MODAL CONFIRMACIÓN -->
-  <div class="modal-overlay" *ngIf="confirmDeleteId !== null">
-    <div class="modal">
-      <p>¿Estás seguro de que deseas eliminar este registro?</p>
-      <p class="modal-warning">⚠️ Si tiene actividades registradas no podrá eliminarse.</p>
-      <div class="modal-actions">
-        <button class="btn-cancel"  (click)="cancelDelete()">Cancelar</button>
-        <button class="btn-confirm" (click)="confirmDelete()">Sí, eliminar</button>
-      </div>
     </div>
   </div>
 </div>
