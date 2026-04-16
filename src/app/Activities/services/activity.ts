@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, switchMap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActivityService {
 
-  private api = 'http://localhost:8000/api/activities';
+ private api = `${environment.apiUrl}/activities`;
 
   private reload$ = new BehaviorSubject<void>(undefined);
 
@@ -45,11 +46,11 @@ export class ActivityService {
   return this.http.post(`${this.api}/${id}/cancel`, {});
   }
   getOperators() {
-    return this.http.get<any[]>('http://localhost:8000/api/operators');
+   return this.http.get<any[]>(`${environment.apiUrl}/operators`);
   }
 
   getProcesses() {
-    return this.http.get<any[]>('http://localhost:8000/api/processes');
+    return this.http.get<any[]>(`${environment.apiUrl}/processes`);
   }
 
   getHistory() {

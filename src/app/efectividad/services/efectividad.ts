@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import {
   BehaviorSubject, Subject, switchMap, takeUntil, tap, catchError, of
 } from 'rxjs';
@@ -14,8 +15,8 @@ export interface EfectividadFilter {
 @Injectable({ providedIn: 'root' })
 export class EfectividadService {
 
-  private api     = 'http://localhost:8000/api/activities/dashboard';
-  private baseApi = 'http://localhost:8000/api'; // ← NUEVO
+  private api     = `${environment.apiUrl}/activities/dashboard`;
+  private baseApi = environment.apiUrl; // ← NUEVO
   private POLL_MS = 10000;
 
   private filters$ = new BehaviorSubject<EfectividadFilter>({
