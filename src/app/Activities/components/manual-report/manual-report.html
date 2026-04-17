@@ -10,7 +10,6 @@
 
   <!-- Alertas -->
   <div class="alert alert-success" *ngIf="success">
-
     <span class="alert-icon">✅</span>
     <span>Reporte registrado correctamente</span>
   </div>
@@ -21,23 +20,22 @@
   </div>
 
   <div class="report-form">
-    
+
     <!-- Sección: Información General -->
     <div class="form-section">
       <div class="section-title">
         <span class="section-icon">👤</span>
         <span>Información General</span>
       </div>
-      
+
       <div class="form-row">
-        <!-- Operador: Dropdown personalizado con búsqueda -->
+        <!-- Operador -->
         <div class="form-group required">
           <label>
             Operador responsable
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
-          
-          <!-- Dropdown para operador -->
+
           <div class="custom-select" [class.open]="operatorDropdownOpen" (clickOutside)="operatorDropdownOpen = false">
             <div class="select-display" (click)="toggleOperatorDropdown()">
               <span class="selected-text" [class.placeholder]="!selectedOperatorName">
@@ -45,20 +43,20 @@
               </span>
               <span class="dropdown-arrow">▼</span>
             </div>
-            
+
             <div class="dropdown-menu" *ngIf="operatorDropdownOpen">
               <div class="dropdown-search">
-                <input 
-                  type="text" 
-                  placeholder="🔍 Buscar operador..." 
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar operador..."
                   [(ngModel)]="operatorSearchTerm"
                   (click)="$event.stopPropagation()"
                   class="search-input"
                 />
               </div>
               <ul class="options-list">
-                <li 
-                  *ngFor="let op of filteredOperators" 
+                <li
+                  *ngFor="let op of filteredOperators"
                   (click)="selectOperator(op)"
                   [class.selected]="form.operator_id === op.id"
                 >
@@ -70,17 +68,17 @@
               </ul>
             </div>
           </div>
-          
+
           <span class="hint">Selecciona el operador que realizó la actividad</span>
         </div>
 
-        <!-- Proceso: Dropdown personalizado con búsqueda -->
+        <!-- Proceso -->
         <div class="form-group required">
           <label>
             Proceso ejecutado
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
-          
+
           <div class="custom-select" [class.open]="processDropdownOpen" (clickOutside)="processDropdownOpen = false">
             <div class="select-display" (click)="toggleProcessDropdown()">
               <span class="selected-text" [class.placeholder]="!selectedProcessName">
@@ -88,20 +86,20 @@
               </span>
               <span class="dropdown-arrow">▼</span>
             </div>
-            
+
             <div class="dropdown-menu" *ngIf="processDropdownOpen">
               <div class="dropdown-search">
-                <input 
-                  type="text" 
-                  placeholder="🔍 Buscar proceso..." 
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar proceso..."
                   [(ngModel)]="processSearchTerm"
                   (click)="$event.stopPropagation()"
                   class="search-input"
                 />
               </div>
               <ul class="options-list">
-                <li 
-                  *ngFor="let pr of filteredProcesses" 
+                <li
+                  *ngFor="let pr of filteredProcesses"
                   (click)="selectProcess(pr)"
                   [class.selected]="form.process_id === pr.id"
                 >
@@ -123,15 +121,15 @@
         <span class="section-icon">🕐</span>
         <span>Tiempos de Ejecución</span>
       </div>
-      
+
       <div class="form-row">
         <div class="form-group required">
           <label>
             Hora de inicio
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
-          <input 
-            type="datetime-local" 
+          <input
+            type="datetime-local"
             [(ngModel)]="form.start_time"
             [class.filled]="form.start_time"
             placeholder="Seleccionar fecha y hora">
@@ -142,14 +140,14 @@
             Hora de finalización
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
-          <input 
-            type="datetime-local" 
+          <input
+            type="datetime-local"
             [(ngModel)]="form.end_time"
             [class.filled]="form.end_time"
             placeholder="Seleccionar fecha y hora">
         </div>
       </div>
-      
+
       <div class="time-helper" *ngIf="form.start_time && form.end_time">
         <span>⏱️ Duración calculada: </span>
         <strong>{{ calculateDuration() }}</strong>
@@ -162,7 +160,7 @@
         <span class="section-icon">📦</span>
         <span>Producción</span>
       </div>
-      
+
       <div class="form-row single">
         <div class="form-group required">
           <label>
@@ -170,10 +168,10 @@
             <span class="required-mark" title="Campo obligatorio">*</span>
           </label>
           <div class="input-wrapper quantity-wrapper">
-            <input 
-              type="number" 
-              [(ngModel)]="form.quantity" 
-              placeholder="0" 
+            <input
+              type="number"
+              [(ngModel)]="form.quantity"
+              placeholder="0"
               min="0"
               [class.filled]="form.quantity"
               class="quantity-input">
@@ -184,18 +182,41 @@
       </div>
     </div>
 
+    <!-- Sección: Observaciones -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-icon">💬</span>
+        <span>Observaciones</span>
+      </div>
+
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea
+  [(ngModel)]="form.notes"
+  placeholder="Agrega cualquier nota o comentario relevante sobre esta actividad..."
+  rows="3"
+  maxlength="500"
+  class="observations-input"
+  [class.filled]="form.notes">
+</textarea>
+          <span class="hint">Opcional · máx. 500 caracteres</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Acciones -->
     <div class="form-actions">
-      <button 
-        (click)="submit()" 
-        class="btn-submit" 
+      <button
+        (click)="submit()"
+        class="btn-submit"
         [disabled]="loading || !isFormValid()"
         [class.ready]="isFormValid() && !loading">
         <span class="btn-icon" *ngIf="!loading">💾</span>
         <span class="btn-icon spinner" *ngIf="loading">⏳</span>
         <span>{{ loading ? 'Guardando reporte...' : 'Registrar Reporte' }}</span>
       </button>
-      
+
       <span class="form-status" *ngIf="!isFormValid()">
         Completa todos los campos obligatorios (*)
       </span>

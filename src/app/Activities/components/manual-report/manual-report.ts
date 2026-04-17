@@ -47,11 +47,12 @@ export class ManualReportComponent {
   private loadingTimeout: any;
 
   form = {
-    operator_id: null as number | null,
-    process_id:  null as number | null,
-    start_time:  '',
-    end_time:    '',
-    quantity:    null as number | null
+    operator_id:  null as number | null,
+    process_id:   null as number | null,
+    start_time:   '',
+    end_time:     '',
+    quantity:     null as number | null,
+    notes: ''
   };
 
   constructor(private cdr: ChangeDetectorRef) {}
@@ -94,14 +95,14 @@ export class ManualReportComponent {
     this.form.operator_id = op.id;
     this.operatorDropdownOpen = false;
     this.operatorSearchTerm = '';
-    this.cdr.markForCheck(); // ← corregido
+    this.cdr.markForCheck();
   }
 
   selectProcess(pr: any) {
     this.form.process_id = pr.id;
     this.processDropdownOpen = false;
     this.processSearchTerm = '';
-    this.cdr.markForCheck(); // ← corregido
+    this.cdr.markForCheck();
   }
 
   isFormValid(): boolean {
@@ -137,24 +138,24 @@ export class ManualReportComponent {
         !this.form.start_time  || !this.form.end_time   ||
         this.form.quantity === null) {
       this.error = 'Todos los campos son obligatorios.';
-      this.cdr.markForCheck(); // ← corregido
+      this.cdr.markForCheck();
       return;
     }
 
     if (new Date(this.form.end_time) <= new Date(this.form.start_time)) {
       this.error = 'La hora final debe ser posterior a la hora de inicio.';
-      this.cdr.markForCheck(); // ← corregido
+      this.cdr.markForCheck();
       return;
     }
 
     this.loading = true;
-    this.cdr.markForCheck(); // ← corregido
+    this.cdr.markForCheck();
 
     this.loadingTimeout = setTimeout(() => {
       if (this.loading) {
         this.loading = false;
         this.error = 'La operación está tomando más tiempo de lo esperado. Intente nuevamente.';
-        this.cdr.markForCheck(); // ← corregido
+        this.cdr.markForCheck();
       }
     }, 10000);
 
@@ -162,29 +163,29 @@ export class ManualReportComponent {
   }
 
   markSuccess() {
-  this.clearLoadingTimeout();
-  this.loading = false;
-  this.success = true;
-  console.log('markSuccess ejecutado - loading:', this.loading, 'success:', this.success);
-  this.form = {
-    operator_id: null,
-    process_id:  null,
-    start_time:  '',
-    end_time:    '',
-    quantity:    null
-  };
-  this.operatorDropdownOpen = false;
-  this.processDropdownOpen = false;
-  this.operatorSearchTerm = '';
-  this.processSearchTerm = '';
-  this.cdr.markForCheck();
-}
+    this.clearLoadingTimeout();
+    this.loading = false;
+    this.success = true;
+    this.form = {
+      operator_id:  null,
+      process_id:   null,
+      start_time:   '',
+      end_time:     '',
+      quantity:     null,
+      notes: ''
+    };
+    this.operatorDropdownOpen = false;
+    this.processDropdownOpen = false;
+    this.operatorSearchTerm = '';
+    this.processSearchTerm = '';
+    this.cdr.markForCheck();
+  }
 
   markError(msg: string) {
     this.clearLoadingTimeout();
     this.loading = false;
     this.error = msg;
-    this.cdr.markForCheck(); // ← corregido
+    this.cdr.markForCheck();
   }
 
   private clearLoadingTimeout() {

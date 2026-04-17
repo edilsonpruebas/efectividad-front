@@ -71,6 +71,8 @@ export class EfectividadTableComponent implements OnChanges {
       ...item,
       notes: item.notes.length ? item.notes.join(' | ') : '—'
     }));
+
+    
   }
 
   // 📄 PAGINACIÓN
