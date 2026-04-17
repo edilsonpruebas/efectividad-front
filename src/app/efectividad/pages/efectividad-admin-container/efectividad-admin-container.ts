@@ -3,7 +3,6 @@ import { Subject, takeUntil } from 'rxjs';
 import { EfectividadAdminComponent } from '../../components/efectividad-admin/efectividad-admin';
 import { EfectividadService } from '../../services/efectividad';
 
-// ── Interfaces ───────────────────────────────────────
 export interface Operator {
   id:        number;
   name:      string;
@@ -20,9 +19,8 @@ export interface Process {
 }
 
 export interface CreateOperatorDto {
-  name:     string;
-  email:    string;
-  password: string;
+  name: string;
+  // email y password son opcionales para el backend, no se envían desde el front
 }
 
 export interface CreateProcessDto {
@@ -30,7 +28,6 @@ export interface CreateProcessDto {
   description?:   string;
   base_per_hour:  number;
 }
-// ─────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-efectividad-admin-container',

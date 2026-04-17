@@ -21,9 +21,7 @@
     </div>
 
     <div class="form-card" *ngIf="showOperatorForm">
-      <input placeholder="Nombre completo"    [(ngModel)]="newOperator.name" />
-      <input placeholder="Correo electrónico" [(ngModel)]="newOperator.email"    type="email" />
-      <input placeholder="Contraseña"         [(ngModel)]="newOperator.password" type="password" />
+      <input placeholder="Nombre completo" [(ngModel)]="newOperator.name" />
       <button class="btn-save" (click)="submitOperator()">Guardar operador</button>
     </div>
 

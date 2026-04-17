@@ -27,7 +27,7 @@ export class EfectividadAdminComponent {
 
   activeTab: 'operators' | 'processes' = 'operators';
 
-  newOperator: CreateOperatorDto = { name: '', email: '', password: '' };
+  newOperator: CreateOperatorDto = { name: '' };
   showOperatorForm               = false;
 
   newProcess: CreateProcessDto = { name: '', description: '', base_per_hour: 0 };
@@ -36,12 +36,10 @@ export class EfectividadAdminComponent {
   confirmDeleteId:   number | null            = null;
   confirmDeleteType: 'operator' | 'process' | null = null;
 
-  // 🔍 PROPIEDADES PARA BÚSQUEDA Y PAGINACIÓN
   searchQuery: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 5;
 
-  // GETTERS PARA OPERADORES (FILTRADO + PAGINACIÓN)
   get filteredOperators(): Operator[] {
     if (!this.searchQuery) return this.operators;
     const q = this.searchQuery.toLowerCase();
@@ -57,7 +55,6 @@ export class EfectividadAdminComponent {
     return Math.ceil(this.filteredOperators.length / this.itemsPerPage) || 1;
   }
 
-  // GETTERS PARA PROCESOS (FILTRADO + PAGINACIÓN)
   get filteredProcesses(): Process[] {
     if (!this.searchQuery) return this.processes;
     const q = this.searchQuery.toLowerCase();
@@ -73,7 +70,6 @@ export class EfectividadAdminComponent {
     return Math.ceil(this.filteredProcesses.length / this.itemsPerPage) || 1;
   }
 
-  // MÉTODOS DE PAGINACIÓN
   prevPage() {
     if (this.currentPage > 1) this.currentPage--;
   }
@@ -88,33 +84,33 @@ export class EfectividadAdminComponent {
   }
 
   submitOperator() {
-    if (!this.newOperator.name || !this.newOperator.email || !this.newOperator.password) return;
-    this.createOperator.emit({ ...this.newOperator });
-    this.newOperator     = { name: '', email: '', password: '' };
+    if (!this.newOperator.name) return;
+    this.createOperator.emit({ name: this.newOperator.name });
+    this.newOperator = { name: '' };
     this.showOperatorForm = false;
   }
 
   submitProcess() {
     if (!this.newProcess.name || !this.newProcess.base_per_hour) return;
     this.createProcess.emit({ ...this.newProcess });
-    this.newProcess     = { name: '', description: '', base_per_hour: 0 };
+    this.newProcess = { name: '', description: '', base_per_hour: 0 };
     this.showProcessForm = false;
   }
 
   askDelete(id: number, type: 'operator' | 'process') {
-    this.confirmDeleteId   = id;
+    this.confirmDeleteId = id;
     this.confirmDeleteType = type;
   }
 
   confirmDelete() {
     if (this.confirmDeleteType === 'operator') this.deleteOperator.emit(this.confirmDeleteId!);
-    if (this.confirmDeleteType === 'process')  this.deleteProcess.emit(this.confirmDeleteId!);
-    this.confirmDeleteId   = null;
+    if (this.confirmDeleteType === 'process') this.deleteProcess.emit(this.confirmDeleteId!);
+    this.confirmDeleteId = null;
     this.confirmDeleteType = null;
   }
 
   cancelDelete() {
-    this.confirmDeleteId   = null;
+    this.confirmDeleteId = null;
     this.confirmDeleteType = null;
   }
 }

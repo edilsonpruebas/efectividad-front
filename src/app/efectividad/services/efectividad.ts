@@ -16,7 +16,7 @@ export interface EfectividadFilter {
 export class EfectividadService {
 
   private api     = `${environment.apiUrl}/activities/dashboard`;
-  private baseApi = environment.apiUrl; // ← NUEVO
+  private baseApi = environment.apiUrl;
   private POLL_MS = 10000;
 
   private filters$ = new BehaviorSubject<EfectividadFilter>({
@@ -41,7 +41,6 @@ export class EfectividadService {
 
   startPolling() {
     this.destroy$ = new Subject<void>();
-    // ✅ FIX #1: filters$ como fuente — reacciona a cada cambio de filtro
     this.filters$
       .pipe(
         tap(() => this.loadingSubject.next(true)),
@@ -64,7 +63,6 @@ export class EfectividadService {
       .subscribe(data => {
         this.loadingSubject.next(false);
         if (!data) return;
-   // ✅ FIX #2: NO tocar effectiveness — viene calculado correctamente del backend
         this.dataSubject.next({
           activities:    data.activities    ?? [],
           metrics:       data.metrics       ?? {},
@@ -90,13 +88,12 @@ export class EfectividadService {
     return this.http.get<any[]>(`${this.baseApi}/processes`);
   }
 
-  // ── OPERADORES ADMIN ─────────────────────────────────
-
   getAllOperators() {
     return this.http.get<any[]>(`${this.baseApi}/operators`);
   }
 
-  createOperator(dto: { name: string; email: string; password: string }) {
+  // Ahora solo envía { name: string }
+  createOperator(dto: { name: string }) {
     return this.http.post<{ message: string; data: any }>(`${this.baseApi}/operators`, dto);
   }
 
@@ -107,8 +104,6 @@ export class EfectividadService {
   deleteOperator(id: number) {
     return this.http.delete<{ message: string }>(`${this.baseApi}/operators/${id}`);
   }
-
-  // ── PROCESOS ADMIN ───────────────────────────────────
 
   getAllProcesses() {
     return this.http.get<any[]>(`${this.baseApi}/processes/all`);
