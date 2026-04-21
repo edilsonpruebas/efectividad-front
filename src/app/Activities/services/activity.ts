@@ -70,15 +70,15 @@ export class ActivityService {
 }
 
 stopTimer(id: number): Observable<any> {
-  return this.http.post(`${this.api}/activities/${id}/stop-timer`, {});
+  return this.http.post(`${this.api}/${id}/stop-timer`, {});
 }
 
 submitReport(id: number, data: { quantity: number; notes?: string }): Observable<any> {
-  return this.http.post(`${this.api}/activities/${id}/submit-report`, data);
+  return this.http.post(`${this.api}/${id}/submit-report`, data);
 }
 
 quickReport(data: { operator_id: number; process_id: number; quantity: number; notes?: string }): Observable<any> {
-  return this.http.post(`${this.api}/activities/quick-report`, data);
+  return this.http.post(`${this.api}/quick-report`, data);
 }
   
 }

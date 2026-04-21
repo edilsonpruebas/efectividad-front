@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive  } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIf } from '@angular/common';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -12,7 +13,13 @@ import { NgIf } from '@angular/common';
 export class AppLayoutComponent {
   sidebarOpen = true;
 
-  toggle() {
+  constructor(public auth: AuthService) {}
+
+  toggle(): void {
     this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  logout(): void {
+    this.auth.logout();
   }
 }

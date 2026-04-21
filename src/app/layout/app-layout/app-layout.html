@@ -1,6 +1,5 @@
 <div class="app-shell" [class.collapsed]="!sidebarOpen">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
 
     <div class="sidebar-header">
@@ -12,6 +11,7 @@
 
     <nav class="sidebar-nav">
 
+      <!-- OPERACIONES — visible para todos -->
       <div class="nav-section">
         <span class="nav-section-label" *ngIf="sidebarOpen">Operaciones</span>
 
@@ -24,7 +24,8 @@
         </a>
       </div>
 
-      <div class="nav-section">
+      <!-- REPORTES — solo ADMIN -->
+      <div class="nav-section" *ngIf="auth.isAdmin()">
         <span class="nav-section-label" *ngIf="sidebarOpen">Reportes</span>
 
         <a routerLink="/reports/efectividad"
@@ -42,27 +43,29 @@
         </a>
       </div>
 
-      <!-- ✅ NUEVA SECCIÓN: ADMINISTRACIÓN -->
-      <div class="nav-section" *ngIf="sidebarOpen">
-        <span class="nav-section-label">Administración</span>
+      <!-- ADMINISTRACIÓN — solo ADMIN -->
+      <div class="nav-section" *ngIf="auth.isAdmin()">
+        <span class="nav-section-label" *ngIf="sidebarOpen">Administración</span>
 
         <a routerLink="/admin/efectividad"
            routerLinkActive="active"
            class="nav-item">
           <span class="nav-icon">🔧</span>
-          <span class="nav-label">Operadores y Procesos</span>
+          <span class="nav-label" *ngIf="sidebarOpen">Operadores y Procesos</span>
         </a>
       </div>
 
     </nav>
 
+    <!-- FOOTER con usuario y logout -->
     <div class="sidebar-footer" *ngIf="sidebarOpen">
-      <span>v1.0.0</span>
+      <span class="sidebar-user">{{ auth.getUser()?.name }}</span>
+      <span class="sidebar-role">{{ auth.getUser()?.role }}</span>
+      <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
     </div>
 
   </aside>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <main class="main-content">
     <router-outlet />
   </main>

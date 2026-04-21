@@ -1,16 +1,17 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http'; // ← agrega withInterceptors
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { authInterceptor } from './auth/components/interceptors/auth.interceptor'; // ← agrega este import
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideAnimations(),  // ← esto faltaba
-    provideHttpClient(withFetch())  // ← también lo agrego, lo tenías importado pero no registrado
+    provideAnimations(),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])) // ← agrega withInterceptors
   ]
 };
