@@ -2,6 +2,7 @@
   <table>
     <thead>
       <tr>
+        <th class="col-toggle"></th>
         <th>#</th>
         <th>Operador</th>
         <th>Proceso</th>
@@ -14,23 +15,74 @@
       </tr>
     </thead>
     <tbody>
-     <tr *ngFor="let act of paginatedActivities; let i = index; trackBy: trackByFn">
-        <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
-        <td>{{ act.operator?.name ?? '—' }}</td>
-        <td>{{ act.process?.name ?? '—' }}</td>
-        <td>{{ act.start_time | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td>{{ act.end_time ? (act.end_time | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
-        <td>{{ durationMinutes(act) }}</td>
-        <td>{{ act.quantity ?? '—' }}</td>
-        <td>
-          <span class="badge" [ngClass]="statusClass(act.status)">
-            {{ statusLabel(act.status) }}
-          </span>
-        </td>
-        <td>{{ act.notes ?? '—' }}</td>
-      </tr>
+      <ng-container *ngFor="let act of paginatedActivities; let i = index; trackBy: trackByFn">
+
+        <!-- 🔥 FILA CONSOLIDADA PRINCIPAL -->
+        <tr
+          class="row-consolidated"
+          [class.row-expanded]="isExpanded(act.id)"
+          (click)="toggleRow(act.id)"
+          [title]="act.rawItems.length > 1 ? 'Click para ver ' + act.rawItems.length + ' registros' : ''">
+
+          <!-- Botón toggle -->
+          <td class="col-toggle">
+            <button
+              class="toggle-btn"
+              *ngIf="act.rawItems.length > 1"
+              [class.open]="isExpanded(act.id)"
+              (click)="$event.stopPropagation(); toggleRow(act.id)"
+              [attr.aria-label]="isExpanded(act.id) ? 'Colapsar' : 'Expandir'">
+              <span class="toggle-icon">▶</span>
+            </button>
+            <span *ngIf="act.rawItems.length === 1" class="single-indicator" title="1 registro">·</span>
+          </td>
+
+          <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+          <td class="cell-operator">{{ act.operator?.name ?? '—' }}</td>
+          <td>{{ act.process?.name ?? '—' }}</td>
+          <td>{{ act.start_time | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ act.end_time ? (act.end_time | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+          <td class="cell-number">
+            {{ durationMinutes(act) }}
+            <span class="count-badge" *ngIf="act.rawItems.length > 1">×{{ act.rawItems.length }}</span>
+          </td>
+          <td class="cell-number">{{ act.quantity ?? '—' }}</td>
+          <td>
+            <span class="badge" [ngClass]="statusClass(act.status)">
+              {{ statusLabel(act.status) }}
+            </span>
+          </td>
+          <td>{{ act.notes ?? '—' }}</td>
+        </tr>
+
+        <!-- 🔥 SUB-FILAS INDIVIDUALES (se muestran al expandir) -->
+        <ng-container *ngIf="isExpanded(act.id)">
+          <tr
+            *ngFor="let raw of act.rawItems; let j = index; trackBy: trackByRaw"
+            class="row-detail">
+            <td class="col-toggle">
+              <span class="detail-connector">└</span>
+            </td>
+            <td class="cell-sub-index">{{ j + 1 }}</td>
+            <td class="cell-operator muted">{{ raw.operator?.name ?? '—' }}</td>
+            <td class="muted">{{ raw.process?.name ?? '—' }}</td>
+            <td>{{ raw.start_time | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ raw.end_time ? (raw.end_time | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+            <td class="cell-number">{{ durationMinutesRaw(raw) }}</td>
+            <td class="cell-number">{{ raw.quantity ?? '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="statusClass(raw.status)">
+                {{ statusLabel(raw.status) }}
+              </span>
+            </td>
+            <td class="muted">{{ raw.notes ?? '—' }}</td>
+          </tr>
+        </ng-container>
+
+      </ng-container>
+
       <tr *ngIf="activities.length === 0">
-        <td colspan="9" class="empty">No hay registros para los filtros aplicados.</td>
+        <td colspan="10" class="empty">No hay registros para los filtros aplicados.</td>
       </tr>
     </tbody>
   </table>

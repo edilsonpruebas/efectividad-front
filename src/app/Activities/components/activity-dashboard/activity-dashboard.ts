@@ -12,24 +12,34 @@ import { DatePipe } from '@angular/common';
 })
 export class ActivityDashboardComponent {
 
-  @Input() activities: any[] = [];
-  @Input() operators: any[] = [];
-  @Input() processes: any[] = [];
+  @Input() activities: any[]  = [];
+  @Input() activeGroups: any[] = [];
+  @Input() operators: any[]   = [];
+  @Input() processes: any[]   = [];
 
-  @Output() onStart        = new EventEmitter<any>();
-  @Output() onStop         = new EventEmitter<any>();
-  @Output() onStopTimer    = new EventEmitter<any>();
-  @Output() onSubmitReport = new EventEmitter<any>();
-  @Output() onQuickReport  = new EventEmitter<any>();
-  @Output() onCancel       = new EventEmitter<any>();
+  @Output() onStart             = new EventEmitter<any>();
+  @Output() onStop              = new EventEmitter<any>();
+  @Output() onStopTimer         = new EventEmitter<any>();
+  @Output() onSubmitReport      = new EventEmitter<any>();
+  @Output() onQuickReport       = new EventEmitter<any>();
+  @Output() onCancel            = new EventEmitter<any>();
+  @Output() onStartGroup        = new EventEmitter<any>();
+  @Output() onStopTimerGroup    = new EventEmitter<any>();
+  @Output() onSubmitReportGroup = new EventEmitter<any>();
+  @Output() onCancelGroup       = new EventEmitter<any>();
 
-  form: { process_id: number | null; operator_id: number | null } = {
-    process_id: null,
-    operator_id: null
+  form: {
+    process_id: number | null;
+    operator_id: number | null;
+    is_group: boolean;
+  } = {
+    process_id:  null,
+    operator_id: null,
+    is_group:    false,
   };
 
   quantities: any = {};
-  notes: any = {};
+  notes: any      = {};
 
   operatorSearch: string = '';
   processSearch: string  = '';
@@ -38,10 +48,16 @@ export class ActivityDashboardComponent {
   operatorLabel: string  = 'Seleccionar operador...';
   processLabel: string   = 'Seleccionar proceso...';
 
+  selectedGroupOperators: any[] = [];
+
+  // ── FILTROS ──────────────────────────────────────────────────────────
+
   get filteredOperators() {
-    if (!this.operatorSearch) return this.operators;
     const search = this.operatorSearch.toLowerCase();
-    return this.operators.filter(op => op.name?.toLowerCase().includes(search));
+    const base   = this.form.is_group
+      ? this.operators.filter(op => !this.selectedGroupOperators.find(s => s.id === op.id))
+      : this.operators;
+    return search ? base.filter(op => op.name?.toLowerCase().includes(search)) : base;
   }
 
   get filteredProcesses() {
@@ -49,6 +65,8 @@ export class ActivityDashboardComponent {
     const search = this.processSearch.toLowerCase();
     return this.processes.filter(pr => pr.name?.toLowerCase().includes(search));
   }
+
+  // ── DROPDOWNS ────────────────────────────────────────────────────────
 
   toggleOperator() {
     this.operatorOpen = !this.operatorOpen;
@@ -72,11 +90,37 @@ export class ActivityDashboardComponent {
     this.processOpen     = false;
   }
 
-  start() {
-    this.onStart.emit(this.form);
+  // ── MODO GRUPAL ───────────────────────────────────────────────────────
+
+  addOperatorToGroup(op: any) {
+    if (!this.selectedGroupOperators.find(o => o.id === op.id)) {
+      this.selectedGroupOperators.push(op);
+    }
+    this.operatorOpen = false;
   }
 
-  // Legacy — por si se usa en otro lado
+  removeOperatorFromGroup(opId: number) {
+    this.selectedGroupOperators = this.selectedGroupOperators.filter(o => o.id !== opId);
+  }
+
+  switchMode(isGroup: boolean) {
+    this.form.is_group          = isGroup;
+    this.form.operator_id       = null;
+    this.operatorLabel          = 'Seleccionar operador...';
+    this.selectedGroupOperators = [];
+    this.operatorSearch         = '';
+    this.operatorOpen           = false;
+  }
+
+  // ── ACCIONES INDIVIDUALES ─────────────────────────────────────────────
+
+  start() {
+    this.onStart.emit({
+      process_id:  this.form.process_id,
+      operator_id: this.form.operator_id,
+    });
+  }
+
   stop(activity: any) {
     this.onStop.emit({
       id:       activity.id,
@@ -106,8 +150,38 @@ export class ActivityDashboardComponent {
     });
   }
 
+  cancel(activity: any) {
+    this.onCancel.emit({ id: activity.id });
+  }
 
-cancel(activity: any) {
-  this.onCancel.emit({ id: activity.id });
-}
+  // ── ACCIONES GRUPALES ─────────────────────────────────────────────────
+
+  startGroup() {
+    this.onStartGroup.emit({
+      process_id:   this.form.process_id,
+      operator_ids: this.selectedGroupOperators.map(o => o.id),
+    });
+  }
+
+  stopTimerGroup(group: any) {
+    this.onStopTimerGroup.emit({ id: group.id });
+  }
+
+  submitReportGroup(group: any) {
+    this.onSubmitReportGroup.emit({
+      id:       group.id,
+      quantity: this.quantities['group_' + group.id],
+      notes:    this.notes['group_' + group.id] ?? '',
+    });
+  }
+
+  cancelGroup(group: any) {
+    this.onCancelGroup.emit({ id: group.id });
+  }
+
+  // ── HELPERS ───────────────────────────────────────────────────────────
+
+  groupOperatorNames(group: any): string {
+    return group.activities?.map((a: any) => a.operator?.name).join(', ') ?? '—';
+  }
 }

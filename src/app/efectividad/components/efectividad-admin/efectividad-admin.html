@@ -25,13 +25,12 @@
       <button class="btn-save" (click)="submitOperator()">Guardar operador</button>
     </div>
 
-    <!-- 🔍 BUSCADOR -->
     <div class="search-box" style="margin: 16px 0;">
-      <input 
-        type="text" 
-        [(ngModel)]="searchQuery" 
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
         (input)="currentPage = 1"
-        placeholder="🔍 Buscar operador por nombre..." 
+        placeholder="🔍 Buscar operador por nombre..."
         style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;">
     </div>
 
@@ -55,10 +54,9 @@
       </div>
     </div>
 
-    <!-- 🔢 PAGINACIÓN -->
     <div class="pagination" *ngIf="totalOperatorPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
-      <button 
-        (click)="prevPage()" 
+      <button
+        (click)="prevPage()"
         [disabled]="currentPage === 1"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
         [style.opacity]="currentPage === 1 ? '0.5' : '1'">
@@ -67,8 +65,8 @@
       <span style="font-size: 14px; color: #374151;">
         Página {{ currentPage }} de {{ totalOperatorPages }}
       </span>
-      <button 
-        (click)="nextPage(totalOperatorPages)" 
+      <button
+        (click)="nextPage(totalOperatorPages)"
         [disabled]="currentPage === totalOperatorPages"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
         [style.opacity]="currentPage === totalOperatorPages ? '0.5' : '1'">
@@ -86,6 +84,7 @@
       </button>
     </div>
 
+    <!-- FORMULARIO CREAR -->
     <div class="form-card" *ngIf="showProcessForm">
       <input placeholder="Nombre del proceso"     [(ngModel)]="newProcess.name" />
       <input placeholder="Descripción (opcional)" [(ngModel)]="newProcess.description" />
@@ -93,26 +92,42 @@
       <button class="btn-save" (click)="submitProcess()">Guardar proceso</button>
     </div>
 
-    <!-- 🔍 BUSCADOR -->
+    <!-- FORMULARIO EDITAR -->
+    <div class="form-card form-card-edit" *ngIf="editingProcess">
+      <div class="form-card-edit-title">✏️ Editando: <strong>{{ editingProcess.name }}</strong></div>
+      <input placeholder="Nombre del proceso"     [(ngModel)]="editProcessForm.name" />
+      <input placeholder="Descripción (opcional)" [(ngModel)]="editProcessForm.description" />
+      <input placeholder="Meta por hora"          [(ngModel)]="editProcessForm.base_per_hour" type="number" min="0" />
+      <div class="form-card-actions">
+        <button class="btn-save"   (click)="submitEditProcess()">✔ Guardar cambios</button>
+        <button class="btn-cancel-edit" (click)="cancelEditProcess()">✕ Cancelar</button>
+      </div>
+    </div>
+
     <div class="search-box" style="margin: 16px 0;">
-      <input 
-        type="text" 
-        [(ngModel)]="searchQuery" 
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
         (input)="currentPage = 1"
-        placeholder="🔍 Buscar proceso por nombre..." 
+        placeholder="🔍 Buscar proceso por nombre..."
         style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;">
     </div>
 
     <div class="item-list">
-      <div class="item-row" *ngFor="let pr of paginatedProcesses">
+      <div class="item-row" *ngFor="let pr of paginatedProcesses"
+           [class.item-row-editing]="editingProcess?.id === pr.id">
         <div class="item-info">
           <span class="item-name">{{ pr.name }}</span>
           <span class="item-sub">Meta: {{ pr.base_per_hour }}/hr</span>
+          <span class="item-sub" *ngIf="pr.description">{{ pr.description }}</span>
         </div>
         <div class="item-actions">
           <span class="badge" [ngClass]="pr.is_active ? 'badge-active' : 'badge-inactive'">
             {{ pr.is_active ? 'Activo' : 'Inactivo' }}
           </span>
+          <button class="btn-edit"   (click)="startEditProcess(pr)">
+            ✏️ Editar
+          </button>
           <button class="btn-toggle" (click)="toggleProcess.emit(pr.id)">
             {{ pr.is_active ? 'Desactivar' : 'Activar' }}
           </button>
@@ -123,10 +138,9 @@
       </div>
     </div>
 
-    <!-- 🔢 PAGINACIÓN -->
     <div class="pagination" *ngIf="totalProcessPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
-      <button 
-        (click)="prevPage()" 
+      <button
+        (click)="prevPage()"
         [disabled]="currentPage === 1"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
         [style.opacity]="currentPage === 1 ? '0.5' : '1'">
@@ -135,8 +149,8 @@
       <span style="font-size: 14px; color: #374151;">
         Página {{ currentPage }} de {{ totalProcessPages }}
       </span>
-      <button 
-        (click)="nextPage(totalProcessPages)" 
+      <button
+        (click)="nextPage(totalProcessPages)"
         [disabled]="currentPage === totalProcessPages"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
         [style.opacity]="currentPage === totalProcessPages ? '0.5' : '1'">

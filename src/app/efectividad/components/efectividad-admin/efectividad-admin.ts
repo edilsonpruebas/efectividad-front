@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  Operator, Process, CreateOperatorDto, CreateProcessDto
+  Operator, Process, CreateOperatorDto, CreateProcessDto, UpdateProcessDto
 } from '../../pages/efectividad-admin-container/efectividad-admin-container';
 
 @Component({
@@ -24,6 +24,7 @@ export class EfectividadAdminComponent {
   @Output() createProcess  = new EventEmitter<CreateProcessDto>();
   @Output() toggleProcess  = new EventEmitter<number>();
   @Output() deleteProcess  = new EventEmitter<number>();
+  @Output() updateProcess  = new EventEmitter<{ id: number; dto: UpdateProcessDto }>();
 
   activeTab: 'operators' | 'processes' = 'operators';
 
@@ -33,7 +34,10 @@ export class EfectividadAdminComponent {
   newProcess: CreateProcessDto = { name: '', description: '', base_per_hour: 0 };
   showProcessForm               = false;
 
-  confirmDeleteId:   number | null            = null;
+  editingProcess: Process | null = null;
+  editProcessForm: UpdateProcessDto = { name: '', description: '', base_per_hour: 0 };
+
+  confirmDeleteId:   number | null                 = null;
   confirmDeleteType: 'operator' | 'process' | null = null;
 
   searchQuery: string = '';
@@ -97,20 +101,41 @@ export class EfectividadAdminComponent {
     this.showProcessForm = false;
   }
 
+  startEditProcess(pr: Process) {
+    this.editingProcess = pr;
+    this.editProcessForm = {
+      name:          pr.name,
+      description:   pr.description ?? '',
+      base_per_hour: pr.base_per_hour,
+    };
+  }
+
+  cancelEditProcess() {
+    this.editingProcess = null;
+    this.editProcessForm = { name: '', description: '', base_per_hour: 0 };
+  }
+
+  submitEditProcess() {
+    if (!this.editingProcess || !this.editProcessForm.name || !this.editProcessForm.base_per_hour) return;
+    this.updateProcess.emit({ id: this.editingProcess.id, dto: { ...this.editProcessForm } });
+    this.editingProcess = null;
+    this.editProcessForm = { name: '', description: '', base_per_hour: 0 };
+  }
+
   askDelete(id: number, type: 'operator' | 'process') {
-    this.confirmDeleteId = id;
+    this.confirmDeleteId   = id;
     this.confirmDeleteType = type;
   }
 
   confirmDelete() {
     if (this.confirmDeleteType === 'operator') this.deleteOperator.emit(this.confirmDeleteId!);
-    if (this.confirmDeleteType === 'process') this.deleteProcess.emit(this.confirmDeleteId!);
-    this.confirmDeleteId = null;
+    if (this.confirmDeleteType === 'process')  this.deleteProcess.emit(this.confirmDeleteId!);
+    this.confirmDeleteId   = null;
     this.confirmDeleteType = null;
   }
 
   cancelDelete() {
-    this.confirmDeleteId = null;
+    this.confirmDeleteId   = null;
     this.confirmDeleteType = null;
   }
 }

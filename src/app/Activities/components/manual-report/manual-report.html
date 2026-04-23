@@ -13,7 +13,6 @@
     <span class="alert-icon">✅</span>
     <span>Reporte registrado correctamente</span>
   </div>
-
   <div class="alert alert-error" *ngIf="error">
     <span class="alert-icon">⚠️</span>
     <span>{{ error }}</span>
@@ -28,38 +27,79 @@
         <span>Información General</span>
       </div>
 
+      <!-- TOGGLE INDIVIDUAL / GRUPAL -->
+      <div class="mode-toggle" style="margin-bottom: 1rem;">
+        <button type="button"
+                [class.active]="!isGroup"
+                (click)="switchMode(false)">
+          👤 Individual
+        </button>
+        <button type="button"
+                [class.active]="isGroup"
+                (click)="switchMode(true)">
+          👥 Grupal
+        </button>
+      </div>
+
       <div class="form-row">
-        <!-- Operador -->
-        <div class="form-group required">
+
+        <!-- MODO INDIVIDUAL: selector único -->
+        <div class="form-group required" *ngIf="!isGroup">
           <label>
             Operador responsable
-            <span class="required-mark" title="Campo obligatorio">*</span>
+            <span class="required-mark">*</span>
           </label>
-
-          <div class="custom-select" [class.open]="operatorDropdownOpen" (clickOutside)="operatorDropdownOpen = false">
+          <div class="custom-select" [class.open]="operatorDropdownOpen"
+               (clickOutside)="operatorDropdownOpen = false">
             <div class="select-display" (click)="toggleOperatorDropdown()">
               <span class="selected-text" [class.placeholder]="!selectedOperatorName">
                 {{ selectedOperatorName || 'Seleccionar operador...' }}
               </span>
               <span class="dropdown-arrow">▼</span>
             </div>
-
             <div class="dropdown-menu" *ngIf="operatorDropdownOpen">
               <div class="dropdown-search">
-                <input
-                  type="text"
-                  placeholder="🔍 Buscar operador..."
-                  [(ngModel)]="operatorSearchTerm"
-                  (click)="$event.stopPropagation()"
-                  class="search-input"
-                />
+                <input type="text" placeholder="🔍 Buscar operador..."
+                       [(ngModel)]="operatorSearchTerm"
+                       (click)="$event.stopPropagation()"
+                       class="search-input" />
               </div>
               <ul class="options-list">
-                <li
-                  *ngFor="let op of filteredOperators"
-                  (click)="selectOperator(op)"
-                  [class.selected]="form.operator_id === op.id"
-                >
+                <li *ngFor="let op of filteredOperators"
+                    (click)="selectOperator(op)"
+                    [class.selected]="form.operator_id === op.id">
+                  {{ op.name }}
+                </li>
+                <li class="no-results" *ngIf="filteredOperators.length === 0">
+                  No se encontraron operadores
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODO GRUPAL: selector múltiple -->
+        <div class="form-group required" *ngIf="isGroup">
+          <label>
+            Agregar operadores al grupo
+            <span class="required-mark">*</span>
+          </label>
+          <div class="custom-select" [class.open]="operatorDropdownOpen"
+               (clickOutside)="operatorDropdownOpen = false">
+            <div class="select-display" (click)="toggleOperatorDropdown()">
+              <span class="selected-text placeholder">Agregar operador...</span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="operatorDropdownOpen">
+              <div class="dropdown-search">
+                <input type="text" placeholder="🔍 Buscar operador..."
+                       [(ngModel)]="operatorSearchTerm"
+                       (click)="$event.stopPropagation()"
+                       class="search-input" />
+              </div>
+              <ul class="options-list">
+                <li *ngFor="let op of filteredOperators"
+                    (click)="addOperatorToGroup(op)">
                   {{ op.name }}
                 </li>
                 <li class="no-results" *ngIf="filteredOperators.length === 0">
@@ -69,40 +109,49 @@
             </div>
           </div>
 
-          <span class="hint">Selecciona el operador que realizó la actividad</span>
+          <!-- Chips -->
+          <div class="operator-chips" *ngIf="selectedGroupOperators.length > 0"
+               style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem;">
+            <span class="chip" *ngFor="let op of selectedGroupOperators"
+                  style="display:inline-flex; align-items:center; gap:0.3rem;
+                         background:#e0f0ff; border-radius:999px;
+                         padding:0.25rem 0.6rem; font-size:0.85rem;">
+              {{ op.name }}
+              <button type="button" (click)="removeOperatorFromGroup(op.id)"
+                      style="background:none; border:none; cursor:pointer;
+                             color:#666; font-size:0.8rem;">✕</button>
+            </span>
+          </div>
+          <span class="hint" *ngIf="selectedGroupOperators.length < 2">
+            Selecciona al menos 2 operadores
+          </span>
         </div>
 
         <!-- Proceso -->
         <div class="form-group required">
           <label>
             Proceso ejecutado
-            <span class="required-mark" title="Campo obligatorio">*</span>
+            <span class="required-mark">*</span>
           </label>
-
-          <div class="custom-select" [class.open]="processDropdownOpen" (clickOutside)="processDropdownOpen = false">
+          <div class="custom-select" [class.open]="processDropdownOpen"
+               (clickOutside)="processDropdownOpen = false">
             <div class="select-display" (click)="toggleProcessDropdown()">
               <span class="selected-text" [class.placeholder]="!selectedProcessName">
                 {{ selectedProcessName || 'Seleccionar proceso...' }}
               </span>
               <span class="dropdown-arrow">▼</span>
             </div>
-
             <div class="dropdown-menu" *ngIf="processDropdownOpen">
               <div class="dropdown-search">
-                <input
-                  type="text"
-                  placeholder="🔍 Buscar proceso..."
-                  [(ngModel)]="processSearchTerm"
-                  (click)="$event.stopPropagation()"
-                  class="search-input"
-                />
+                <input type="text" placeholder="🔍 Buscar proceso..."
+                       [(ngModel)]="processSearchTerm"
+                       (click)="$event.stopPropagation()"
+                       class="search-input" />
               </div>
               <ul class="options-list">
-                <li
-                  *ngFor="let pr of filteredProcesses"
-                  (click)="selectProcess(pr)"
-                  [class.selected]="form.process_id === pr.id"
-                >
+                <li *ngFor="let pr of filteredProcesses"
+                    (click)="selectProcess(pr)"
+                    [class.selected]="form.process_id === pr.id">
                   {{ pr.name }}
                 </li>
                 <li class="no-results" *ngIf="filteredProcesses.length === 0">
@@ -112,6 +161,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -121,33 +171,18 @@
         <span class="section-icon">🕐</span>
         <span>Tiempos de Ejecución</span>
       </div>
-
       <div class="form-row">
         <div class="form-group required">
-          <label>
-            Hora de inicio
-            <span class="required-mark" title="Campo obligatorio">*</span>
-          </label>
-          <input
-            type="datetime-local"
-            [(ngModel)]="form.start_time"
-            [class.filled]="form.start_time"
-            placeholder="Seleccionar fecha y hora">
+          <label>Hora de inicio <span class="required-mark">*</span></label>
+          <input type="datetime-local" [(ngModel)]="form.start_time"
+                 [class.filled]="form.start_time">
         </div>
-
         <div class="form-group required">
-          <label>
-            Hora de finalización
-            <span class="required-mark" title="Campo obligatorio">*</span>
-          </label>
-          <input
-            type="datetime-local"
-            [(ngModel)]="form.end_time"
-            [class.filled]="form.end_time"
-            placeholder="Seleccionar fecha y hora">
+          <label>Hora de finalización <span class="required-mark">*</span></label>
+          <input type="datetime-local" [(ngModel)]="form.end_time"
+                 [class.filled]="form.end_time">
         </div>
       </div>
-
       <div class="time-helper" *ngIf="form.start_time && form.end_time">
         <span>⏱️ Duración calculada: </span>
         <strong>{{ calculateDuration() }}</strong>
@@ -160,24 +195,19 @@
         <span class="section-icon">📦</span>
         <span>Producción</span>
       </div>
-
       <div class="form-row single">
         <div class="form-group required">
-          <label>
-            Cantidad producida
-            <span class="required-mark" title="Campo obligatorio">*</span>
-          </label>
+          <label>Cantidad producida <span class="required-mark">*</span></label>
           <div class="input-wrapper quantity-wrapper">
-            <input
-              type="number"
-              [(ngModel)]="form.quantity"
-              placeholder="0"
-              min="0"
-              [class.filled]="form.quantity"
-              class="quantity-input">
+            <input type="number" [(ngModel)]="form.quantity"
+                   placeholder="0" min="0"
+                   [class.filled]="form.quantity"
+                   class="quantity-input">
             <span class="unit-label">unidades</span>
           </div>
-          <span class="hint">Ingresa el total de unidades fabricadas en este proceso</span>
+          <span class="hint" *ngIf="isGroup">
+            Cantidad total producida por el grupo (no se divide entre operadores)
+          </span>
         </div>
       </div>
     </div>
@@ -188,18 +218,15 @@
         <span class="section-icon">💬</span>
         <span>Observaciones</span>
       </div>
-
       <div class="form-row single">
         <div class="form-group">
           <label>Observaciones</label>
-          <textarea
-  [(ngModel)]="form.notes"
-  placeholder="Agrega cualquier nota o comentario relevante sobre esta actividad..."
-  rows="3"
-  maxlength="500"
-  class="observations-input"
-  [class.filled]="form.notes">
-</textarea>
+          <textarea [(ngModel)]="form.notes"
+                    placeholder="Agrega cualquier nota o comentario relevante..."
+                    rows="3" maxlength="500"
+                    class="observations-input"
+                    [class.filled]="form.notes">
+          </textarea>
           <span class="hint">Opcional · máx. 500 caracteres</span>
         </div>
       </div>
@@ -207,16 +234,13 @@
 
     <!-- Acciones -->
     <div class="form-actions">
-      <button
-        (click)="submit()"
-        class="btn-submit"
-        [disabled]="loading || !isFormValid()"
-        [class.ready]="isFormValid() && !loading">
+      <button (click)="submit()" class="btn-submit"
+              [disabled]="loading || !isFormValid()"
+              [class.ready]="isFormValid() && !loading">
         <span class="btn-icon" *ngIf="!loading">💾</span>
         <span class="btn-icon spinner" *ngIf="loading">⏳</span>
         <span>{{ loading ? 'Guardando reporte...' : 'Registrar Reporte' }}</span>
       </button>
-
       <span class="form-status" *ngIf="!isFormValid()">
         Completa todos los campos obligatorios (*)
       </span>

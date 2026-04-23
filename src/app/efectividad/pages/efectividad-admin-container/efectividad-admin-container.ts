@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { EfectividadAdminComponent } from '../../components/efectividad-admin/efectividad-admin';
 import { EfectividadService } from '../../services/efectividad';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface Operator {
   id:        number;
@@ -20,13 +21,18 @@ export interface Process {
 
 export interface CreateOperatorDto {
   name: string;
-  // email y password son opcionales para el backend, no se envían desde el front
 }
 
 export interface CreateProcessDto {
-  name:           string;
+  name:          string;
+  description?:  string;
+  base_per_hour: number;
+}
+
+export interface UpdateProcessDto {
+  name?:          string;
   description?:   string;
-  base_per_hour:  number;
+  base_per_hour?: number;
 }
 
 @Component({
@@ -43,7 +49,8 @@ export interface CreateProcessDto {
       (deleteOperator)="onDeleteOperator($event)"
       (createProcess)="onCreateProcess($event)"
       (toggleProcess)="onToggleProcess($event)"
-      (deleteProcess)="onDeleteProcess($event)">
+      (deleteProcess)="onDeleteProcess($event)"
+      (updateProcess)="onUpdateProcess($event)">
     </app-efectividad-admin>
   `
 })
@@ -119,6 +126,15 @@ export class EfectividadAdminContainerComponent implements OnInit, OnDestroy {
       .subscribe({
         next:  () => this.loadProcesses(),
         error: e  => alert(e?.error?.message ?? 'Error al eliminar proceso')
+      });
+  }
+
+  onUpdateProcess(payload: { id: number; dto: UpdateProcessDto }) {
+    this.service.updateProcess(payload.id, payload.dto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next:  () => this.loadProcesses(),
+        error: (e: HttpErrorResponse) => alert(e?.error?.message ?? 'Error al actualizar proceso')
       });
   }
 

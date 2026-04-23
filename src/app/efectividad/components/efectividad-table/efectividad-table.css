@@ -228,3 +228,226 @@
   color: #64748b;
   font-weight: 500;
 }
+
+/* ─── WRAPPER ─────────────────────────────────────── */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+ 
+/* ─── TABLE BASE ─────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  background: #fff;
+}
+ 
+thead tr {
+  background: #f0f4f8;
+  border-bottom: 2px solid #dde3ea;
+}
+ 
+th {
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #4a5568;
+  white-space: nowrap;
+}
+ 
+/* ─── COLUMNA TOGGLE ─────────────────────────────── */
+.col-toggle {
+  width: 40px;
+  text-align: center;
+  padding: 0 6px !important;
+}
+ 
+/* ─── FILA CONSOLIDADA PRINCIPAL ─────────────────── */
+.row-consolidated {
+  border-bottom: 1px solid #e8edf2;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+ 
+.row-consolidated:hover {
+  background: #f7fafc;
+}
+ 
+.row-consolidated.row-expanded {
+  background: #edf2ff;
+  border-bottom: none;
+}
+ 
+.row-consolidated td {
+  padding: 10px 14px;
+  vertical-align: middle;
+}
+ 
+/* ─── BOTÓN TOGGLE ───────────────────────────────── */
+.toggle-btn {
+  background: none;
+  border: 1px solid #c3cfe2;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  padding: 0;
+  color: #718096;
+}
+ 
+.toggle-btn:hover {
+  background: #e2e8f0;
+  border-color: #a0aec0;
+}
+ 
+.toggle-icon {
+  font-size: 0.55rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+ 
+.toggle-btn.open .toggle-icon {
+  transform: rotate(90deg);
+}
+ 
+.single-indicator {
+  color: #cbd5e0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+ 
+/* ─── BADGE DE CONTEO ────────────────────────────── */
+.count-badge {
+  display: inline-block;
+  margin-left: 6px;
+  background: #667eea;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+  vertical-align: middle;
+}
+ 
+/* ─── SUB-FILAS DETALLE ──────────────────────────── */
+.row-detail {
+  background: #f8f9ff;
+  border-bottom: 1px solid #e4e9f4;
+  animation: slideDown 0.18s ease;
+}
+ 
+.row-detail:last-of-type {
+  border-bottom: 2px solid #c3cfe2;
+}
+ 
+.row-detail td {
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  vertical-align: middle;
+  color: #4a5568;
+}
+ 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+.detail-connector {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  font-family: monospace;
+}
+ 
+.cell-sub-index {
+  color: #a0aec0;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+ 
+.muted {
+  color: #718096 !important;
+}
+ 
+/* ─── CELDAS NUMÉRICAS ───────────────────────────── */
+.cell-number {
+  text-align: right;
+}
+ 
+.cell-operator {
+  font-weight: 500;
+}
+ 
+/* ─── BADGES ESTADO ──────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+ 
+.badge-open       { background: #c6f6d5; color: #276749; }
+.badge-closed     { background: #bee3f8; color: #2a6496; }
+.badge-cancelled  { background: #fed7d7; color: #9b2c2c; }
+ 
+/* ─── FILA VACÍA ─────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 32px;
+  color: #a0aec0;
+  font-style: italic;
+}
+ 
+/* ─── PAGINACIÓN ─────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px;
+  background: #f8fafc;
+  border-top: 1px solid #e8edf2;
+  border-radius: 0 0 10px 10px;
+}
+ 
+.pagination-btn {
+  padding: 6px 16px;
+  border: 1px solid #c3cfe2;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4a5568;
+  transition: background 0.15s;
+}
+ 
+.pagination-btn:hover:not(:disabled) {
+  background: #edf2ff;
+  border-color: #667eea;
+  color: #667eea;
+}
+ 
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+ 
+.pagination-info {
+  font-size: 0.85rem;
+  color: #718096;
+}

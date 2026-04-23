@@ -8,7 +8,8 @@ import { environment } from '../../../environments/environment';
 })
 export class ActivityService {
 
- private api = `${environment.apiUrl}/activities`;
+  private api      = `${environment.apiUrl}/activities`;
+  private apiGroup = `${environment.apiUrl}/activity-groups`;
 
   private reload$ = new BehaviorSubject<void>(undefined);
 
@@ -33,7 +34,8 @@ export class ActivityService {
     this.reload$.next();
   }
 
-  // ✅ sin tap — el reload lo maneja el container
+  // ── INDIVIDUALES ─────────────────────────────────────────────────────
+
   start(data: any) {
     return this.http.post(`${this.api}/start`, data);
   }
@@ -43,42 +45,60 @@ export class ActivityService {
   }
 
   cancel(id: number) {
-  return this.http.post(`${this.api}/${id}/cancel`, {});
+    return this.http.post(`${this.api}/${id}/cancel`, {});
   }
+
+  stopTimer(id: number): Observable<any> {
+    return this.http.post(`${this.api}/${id}/stop-timer`, {});
+  }
+
+  submitReport(id: number, data: { quantity: number; notes?: string }): Observable<any> {
+    return this.http.post(`${this.api}/${id}/submit-report`, data);
+  }
+
+  quickReport(data: { operator_id: number; process_id: number; quantity: number; notes?: string }): Observable<any> {
+    return this.http.post(`${this.api}/quick-report`, data);
+  }
+
+  reportManual(data: any) {
+    return this.http.post(`${this.api}/report-manual`, data);
+  }
+
+  addNote(id: number, notes: string) {
+    return this.http.post(`${this.api}/${id}/note`, { notes });
+  }
+
+  getHistory() {
+    return this.http.get<any[]>(`${this.api}/history`);
+  }
+
   getOperators() {
-   return this.http.get<any[]>(`${environment.apiUrl}/operators`);
+    return this.http.get<any[]>(`${environment.apiUrl}/operators`);
   }
 
   getProcesses() {
     return this.http.get<any[]>(`${environment.apiUrl}/processes`);
   }
 
-  getHistory() {
-  return this.http.get<any[]>(`${this.api}/history`);
-  
+  // ── GRUPALES ─────────────────────────────────────────────────────────
+
+  getActiveGroups() {
+    return this.http.get<any[]>(`${this.apiGroup}/open`);
   }
 
-  reportManual(data: any) {
-  return this.http.post(`${this.api}/report-manual`, data);
-  
+  startGroup(data: any) {
+    return this.http.post(`${this.apiGroup}/start`, data);
   }
-  
-  addNote(id: number, notes: string) {
-  return this.http.post(`${this.api}/${id}/note`, { notes });
 
-  
-}
+  stopTimerGroup(id: number) {
+    return this.http.post(`${this.apiGroup}/${id}/stop-timer`, {});
+  }
 
-stopTimer(id: number): Observable<any> {
-  return this.http.post(`${this.api}/${id}/stop-timer`, {});
-}
+  submitReportGroup(id: number, data: any) {
+    return this.http.post(`${this.apiGroup}/${id}/submit-report`, data);
+  }
 
-submitReport(id: number, data: { quantity: number; notes?: string }): Observable<any> {
-  return this.http.post(`${this.api}/${id}/submit-report`, data);
-}
-
-quickReport(data: { operator_id: number; process_id: number; quantity: number; notes?: string }): Observable<any> {
-  return this.http.post(`${this.api}/quick-report`, data);
-}
-  
+  cancelGroup(id: number) {
+    return this.http.post(`${this.apiGroup}/${id}/cancel`, {});
+  }
 }

@@ -9,25 +9,10 @@
         <p class="panel-subtitle">Registra una nueva tarea de producción</p>
       </div>
 
-      <!-- OPERADOR -->
-      <div class="form-group searchable-dropdown" [class.active]="operatorOpen">
-        <label>👤 Operador</label>
-        <div class="dropdown-trigger" (click)="toggleOperator()">
-          <span>{{ operatorLabel }}</span>
-          <span class="arrow">{{ operatorOpen ? '▲' : '▼' }}</span>
-        </div>
-        <div class="dropdown-panel" *ngIf="operatorOpen">
-          <input type="text" [(ngModel)]="operatorSearch"
-                 placeholder="Buscar operador..." autocomplete="off"
-                 (click)="$event.stopPropagation()" />
-          <ul>
-            <li (click)="selectOperator(null, 'Seleccionar operador...')">Todos</li>
-            <li *ngFor="let op of filteredOperators" (click)="selectOperator(op.id, op.name)">
-              {{ op.name }}
-            </li>
-            <li *ngIf="filteredOperators.length === 0" class="no-results">Sin resultados</li>
-          </ul>
-        </div>
+      <!-- TOGGLE INDIVIDUAL / GRUPAL -->
+      <div class="mode-toggle">
+        <button [class.active]="!form.is_group" (click)="switchMode(false)">👤 Individual</button>
+        <button [class.active]="form.is_group"  (click)="switchMode(true)">👥 Grupal</button>
       </div>
 
       <!-- PROCESO -->
@@ -42,7 +27,6 @@
                  placeholder="Buscar proceso..." autocomplete="off"
                  (click)="$event.stopPropagation()" />
           <ul>
-            <li (click)="selectProcess(null, 'Seleccionar proceso...')">Todos</li>
             <li *ngFor="let pr of filteredProcesses" (click)="selectProcess(pr.id, pr.name)">
               {{ pr.name }}
             </li>
@@ -51,10 +35,69 @@
         </div>
       </div>
 
-      <button (click)="start()" class="btn btn-start">
-        <span class="btn-icon">▶</span>
-        <span>Iniciar Producción</span>
-      </button>
+      <!-- MODO INDIVIDUAL -->
+      <ng-container *ngIf="!form.is_group">
+        <div class="form-group searchable-dropdown" [class.active]="operatorOpen">
+          <label>👤 Operador</label>
+          <div class="dropdown-trigger" (click)="toggleOperator()">
+            <span>{{ operatorLabel }}</span>
+            <span class="arrow">{{ operatorOpen ? '▲' : '▼' }}</span>
+          </div>
+          <div class="dropdown-panel" *ngIf="operatorOpen">
+            <input type="text" [(ngModel)]="operatorSearch"
+                   placeholder="Buscar operador..." autocomplete="off"
+                   (click)="$event.stopPropagation()" />
+            <ul>
+              <li *ngFor="let op of filteredOperators" (click)="selectOperator(op.id, op.name)">
+                {{ op.name }}
+              </li>
+              <li *ngIf="filteredOperators.length === 0" class="no-results">Sin resultados</li>
+            </ul>
+          </div>
+        </div>
+
+        <button (click)="start()" class="btn btn-start"
+                [disabled]="!form.process_id || !form.operator_id">
+          <span class="btn-icon">▶</span>
+          <span>Iniciar Producción</span>
+        </button>
+      </ng-container>
+
+      <!-- MODO GRUPAL -->
+      <ng-container *ngIf="form.is_group">
+        <div class="form-group searchable-dropdown" [class.active]="operatorOpen">
+          <label>👥 Agregar operadores al grupo</label>
+          <div class="dropdown-trigger" (click)="toggleOperator()">
+            <span>Agregar operador...</span>
+            <span class="arrow">{{ operatorOpen ? '▲' : '▼' }}</span>
+          </div>
+          <div class="dropdown-panel" *ngIf="operatorOpen">
+            <input type="text" [(ngModel)]="operatorSearch"
+                   placeholder="Buscar operador..." autocomplete="off"
+                   (click)="$event.stopPropagation()" />
+            <ul>
+              <li *ngFor="let op of filteredOperators" (click)="addOperatorToGroup(op)">
+                {{ op.name }}
+              </li>
+              <li *ngIf="filteredOperators.length === 0" class="no-results">Sin resultados</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Chips operadores seleccionados -->
+        <div class="operator-chips" *ngIf="selectedGroupOperators.length > 0">
+          <span class="chip" *ngFor="let op of selectedGroupOperators">
+            {{ op.name }}
+            <button (click)="removeOperatorFromGroup(op.id)">✕</button>
+          </span>
+        </div>
+
+        <button (click)="startGroup()" class="btn btn-start"
+                [disabled]="!form.process_id || selectedGroupOperators.length < 2">
+          <span class="btn-icon">▶</span>
+          <span>Iniciar Grupo ({{ selectedGroupOperators.length }} operadores)</span>
+        </button>
+      </ng-container>
 
     </div>
   </div>
@@ -63,17 +106,18 @@
   <div class="panel list-panel">
     <div class="panel-header">
       <h2>📋 Actividades en Proceso</h2>
-      <span class="badge-count" *ngIf="activities.length > 0">
-        {{ activities.length }} activas
+      <span class="badge-count" *ngIf="activities.length + activeGroups.length > 0">
+        {{ activities.length + activeGroups.length }} activas
       </span>
     </div>
 
-    <div class="empty-state" *ngIf="activities.length === 0">
+    <div class="empty-state" *ngIf="activities.length === 0 && activeGroups.length === 0">
       <div class="empty-icon">⏳</div>
       <p>No hay actividades en proceso</p>
       <span>Inicia una nueva actividad desde el panel izquierdo</span>
     </div>
 
+    <!-- TARJETAS INDIVIDUALES -->
     <div *ngFor="let act of activities; let i = index"
          class="card"
          [style.animation-delay]="i * 0.1 + 's'">
@@ -99,63 +143,47 @@
 
       <div class="card-actions">
 
-        <!-- ── ESTADO: OPEN ── -->
         <ng-container *ngIf="act.status === 'OPEN'">
           <div class="card-form">
             <div class="card-inputs-row">
               <div class="input-group">
                 <label class="input-label">Cantidad</label>
-                <input type="number"
-                       [(ngModel)]="quantities[act.id]"
-                       placeholder="0"
-                       min="0">
+                <input type="number" [(ngModel)]="quantities[act.id]" placeholder="0" min="0">
               </div>
               <div class="input-group">
                 <label class="input-label">Observaciones</label>
-                <input type="text"
-                       [(ngModel)]="notes[act.id]"
-                       placeholder="Opcional...">
+                <input type="text" [(ngModel)]="notes[act.id]" placeholder="Opcional...">
               </div>
             </div>
             <div class="card-buttons-row">
               <button (click)="cancel(act)" class="btn btn-cancel">
-                <span class="btn-icon">✖</span>
-                <span>Cancelar</span>
+                <span class="btn-icon">✖</span><span>Cancelar</span>
               </button>
               <button (click)="stopTimer(act)" class="btn btn-stop-timer">
-                <span class="btn-icon">⏹</span>
-                <span>Terminar</span>
+                <span class="btn-icon">⏹</span><span>Terminar</span>
               </button>
             </div>
           </div>
         </ng-container>
 
-        <!-- ── ESTADO: STOPPED ── -->
         <ng-container *ngIf="act.status === 'STOPPED'">
           <div class="card-form">
             <div class="card-inputs-row">
               <div class="input-group">
                 <label class="input-label">Cantidad</label>
-                <input type="number"
-                       [(ngModel)]="quantities[act.id]"
-                       placeholder="0"
-                       min="0">
+                <input type="number" [(ngModel)]="quantities[act.id]" placeholder="0" min="0">
               </div>
               <div class="input-group">
                 <label class="input-label">Observaciones</label>
-                <input type="text"
-                       [(ngModel)]="notes[act.id]"
-                       placeholder="Opcional...">
+                <input type="text" [(ngModel)]="notes[act.id]" placeholder="Opcional...">
               </div>
             </div>
             <div class="card-buttons-row">
               <button (click)="cancel(act)" class="btn btn-cancel">
-                <span class="btn-icon">✖</span>
-                <span>Cancelar</span>
+                <span class="btn-icon">✖</span><span>Cancelar</span>
               </button>
               <button (click)="submitReport(act)" class="btn btn-stop">
-                <span class="btn-icon">✔</span>
-                <span>Enviar Reporte</span>
+                <span class="btn-icon">✔</span><span>Enviar Reporte</span>
               </button>
             </div>
           </div>
@@ -163,6 +191,77 @@
 
       </div>
     </div>
+
+    <!-- TARJETAS GRUPALES -->
+    <div *ngFor="let grp of activeGroups; let i = index"
+         class="card card-group"
+         [style.animation-delay]="i * 0.1 + 's'">
+
+      <div class="card-info">
+        <div class="name">
+          <span class="group-badge">👥 Grupal</span>
+          {{ groupOperatorNames(grp) }}
+        </div>
+        <div class="process">
+          <span class="process-dot"></span>
+          {{ grp.process.name }}
+          <span class="base-rate" *ngIf="grp.process?.base_per_hour">
+            • {{ grp.process.base_per_hour }} uds/hr
+          </span>
+        </div>
+        <div class="time">
+          <span class="time-icon">🕐</span>
+          {{ grp.start_time | date:'shortTime' }} —
+          <span class="duration" *ngIf="grp.status === 'OPEN'">En curso</span>
+          <span class="duration" *ngIf="grp.status === 'STOPPED'">
+            Detenido a las {{ grp.end_time | date:'shortTime' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+
+        <ng-container *ngIf="grp.status === 'OPEN'">
+          <div class="card-form">
+            <div class="card-buttons-row">
+              <button (click)="cancelGroup(grp)" class="btn btn-cancel">
+                <span class="btn-icon">✖</span><span>Cancelar</span>
+              </button>
+              <button (click)="stopTimerGroup(grp)" class="btn btn-stop-timer">
+                <span class="btn-icon">⏹</span><span>Terminar</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="grp.status === 'STOPPED'">
+          <div class="card-form">
+            <div class="card-inputs-row">
+              <div class="input-group">
+                <label class="input-label">Cantidad total del grupo</label>
+                <input type="number" [(ngModel)]="quantities['group_' + grp.id]"
+                       placeholder="0" min="0">
+              </div>
+              <div class="input-group">
+                <label class="input-label">Observaciones</label>
+                <input type="text" [(ngModel)]="notes['group_' + grp.id]"
+                       placeholder="Opcional...">
+              </div>
+            </div>
+            <div class="card-buttons-row">
+              <button (click)="cancelGroup(grp)" class="btn btn-cancel">
+                <span class="btn-icon">✖</span><span>Cancelar</span>
+              </button>
+              <button (click)="submitReportGroup(grp)" class="btn btn-stop">
+                <span class="btn-icon">✔</span><span>Enviar Reporte</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+    </div>
+
   </div>
 
 </div>

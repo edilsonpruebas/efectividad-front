@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import {
-  BehaviorSubject, Subject, switchMap, takeUntil, tap, catchError, of
+  BehaviorSubject, Subject, switchMap, takeUntil, tap, catchError, of,
+  Observable
 } from 'rxjs';
+import { UpdateProcessDto } from '../pages/efectividad-admin-container/efectividad-admin-container';
 
 export interface EfectividadFilter {
   date_from:   string | null;
@@ -120,4 +122,7 @@ export class EfectividadService {
   deleteProcess(id: number) {
     return this.http.delete<{ message: string }>(`${this.baseApi}/processes/${id}`);
   }
+  updateProcess(id: number, dto: UpdateProcessDto): Observable<any> {
+  return this.http.put(`${this.baseApi}/processes/${id}`, dto);
+}
 }

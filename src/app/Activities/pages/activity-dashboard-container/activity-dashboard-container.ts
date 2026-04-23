@@ -11,6 +11,7 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <app-activity-dashboard
       [activities]="activities"
+      [activeGroups]="activeGroups"
       [operators]="operators"
       [processes]="processes"
       (onStart)="start($event)"
@@ -18,20 +19,23 @@ import { Subject, takeUntil } from 'rxjs';
       (onStopTimer)="stopTimer($event)"
       (onSubmitReport)="submitReport($event)"
       (onQuickReport)="quickReport($event)"
-      (onCancel)="cancel($event)">
+      (onCancel)="cancel($event)"
+      (onStartGroup)="startGroup($event)"
+      (onStopTimerGroup)="stopTimerGroup($event)"
+      (onSubmitReportGroup)="submitReportGroup($event)"
+      (onCancelGroup)="cancelGroup($event)">
     </app-activity-dashboard>
 
-    <app-activity-history
-      [history]="history">
-    </app-activity-history>
+    <app-activity-history [history]="history"></app-activity-history>
   `
 })
 export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
 
-  activities: any[] = [];
-  operators:  any[] = [];
-  processes:  any[] = [];
-  history:    any[] = [];
+  activities:   any[] = [];
+  activeGroups: any[] = [];
+  operators:    any[] = [];
+  processes:    any[] = [];
+  history:      any[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -51,6 +55,7 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
       .subscribe(data => this.activities = data);
 
     this.loadHistory();
+    this.loadGroups();
     this.service.reload();
   }
 
@@ -60,13 +65,20 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
       .subscribe({ next: (data) => this.history = data, error: (err) => console.error(err) });
   }
 
+  loadGroups() {
+    this.service.getActiveGroups()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: (data) => this.activeGroups = data, error: (err) => console.error(err) });
+  }
+
+  // ── INDIVIDUALES ─────────────────────────────────────────────────────
+
   start(data: any) {
     this.service.start(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({ next: () => this.service.reload(), error: err => console.error(err) });
   }
 
-  // Legacy
   stop(data: any) {
     this.service.stop(data.id, { quantity: data.quantity })
       .pipe(takeUntil(this.destroy$))
@@ -90,10 +102,7 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.submitReport(data.id, { quantity: data.quantity, notes: data.notes })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          this.service.reload();
-          this.loadHistory();
-        },
+        next: () => { this.service.reload(); this.loadHistory(); },
         error: err => console.error(err)
       });
   }
@@ -102,23 +111,54 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.quickReport(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          this.service.reload();
-          this.loadHistory();
-        },
+        next: () => { this.service.reload(); this.loadHistory(); },
         error: err => console.error(err)
       });
   }
 
-  // ✅ MÉTODO AGREGADO (SOLUCIÓN)
   cancel(data: any) {
     this.service.cancel(data.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          this.service.reload();
-          this.loadHistory();
-        },
+        next: () => { this.service.reload(); this.loadHistory(); },
+        error: err => console.error(err)
+      });
+  }
+
+  // ── GRUPALES ─────────────────────────────────────────────────────────
+
+  startGroup(data: any) {
+    this.service.startGroup(data)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.loadGroups(),
+        error: err => console.error(err)
+      });
+  }
+
+  stopTimerGroup(data: any) {
+    this.service.stopTimerGroup(data.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.loadGroups(),
+        error: err => console.error(err)
+      });
+  }
+
+  submitReportGroup(data: any) {
+    this.service.submitReportGroup(data.id, { quantity: data.quantity, notes: data.notes })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => { this.loadGroups(); this.loadHistory(); },
+        error: err => console.error(err)
+      });
+  }
+
+  cancelGroup(data: any) {
+    this.service.cancelGroup(data.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => { this.loadGroups(); this.loadHistory(); },
         error: err => console.error(err)
       });
   }
