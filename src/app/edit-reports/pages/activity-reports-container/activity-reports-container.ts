@@ -99,12 +99,8 @@ export class ActivityReportsContainerComponent implements OnInit {
       : this.service.update(report.id, {
           operator_id: +form.operator_id,
           process_id:  +form.process_id,
-          start_time:  form.start_time
-            ? new Date(form.start_time).toISOString()
-            : undefined,
-          end_time: form.end_time
-            ? new Date(form.end_time).toISOString()
-            : undefined,
+          start_time: form.start_time || undefined,
+          end_time: form.end_time || undefined,
           quantity: +form.quantity,
           notes:    form.notes || null,
         });

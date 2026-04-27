@@ -96,3 +96,110 @@ textarea.rp-input { resize:vertical; min-height:56px; }
   min-width: 180px;
   text-align: center;
 }
+
+/* ── DROPDOWN CON BÚSQUEDA ── */
+.rp-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.rp-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.6rem;
+  background: var(--input-bg, #fff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text, #111827);
+  text-align: left;
+}
+
+.rp-dropdown-trigger:hover {
+  border-color: var(--primary, #6366f1);
+}
+
+.rp-dropdown-arrow {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #6b7280);
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+.rp-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  min-width: 220px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+.rp-dropdown-search {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  font-size: 0.875rem;
+  outline: none;
+  background: var(--input-bg, #f9fafb);
+  box-sizing: border-box;
+}
+
+.rp-dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.rp-dropdown-list li {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--text, #111827);
+  transition: background 0.15s;
+}
+
+.rp-dropdown-list li:hover {
+  background: var(--hover-bg, #f3f4f6);
+}
+
+.rp-dropdown-list li.selected {
+  background: var(--primary-light, #eef2ff);
+  color: var(--primary, #6366f1);
+  font-weight: 500;
+}
+
+.rp-dropdown-empty {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #9ca3af);
+  cursor: default !important;
+}
+
+/* ── PAGINACIÓN ── */
+.rp-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0 0.5rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+.rp-page-info {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  min-width: 180px;
+  text-align: center;
+}

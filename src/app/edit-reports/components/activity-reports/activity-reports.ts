@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -24,7 +24,7 @@ export class ActivityReportsComponent implements OnChanges {
   @Output() onSave         = new EventEmitter<{ report: any; form: any }>();
 
   // Filtros
-  filterDate = new Date().toISOString().split('T')[0];
+  filterDate       = new Date().toISOString().split('T')[0];
   filterOperatorId = '';
   filterProcessId  = '';
   filterStatus     = '';
@@ -40,7 +40,19 @@ export class ActivityReportsComponent implements OnChanges {
   pageSize    = 20;
   currentPage = 1;
 
-  // ── PAGINACIÓN ───────────────────────────────────────────────────────
+  // Dropdowns
+  operatorSearch       = '';
+  processSearch        = '';
+  operatorDropdownOpen = false;
+  processDropdownOpen  = false;
+
+  // ── DOCUMENT CLICK — cerrar dropdowns ────────────────────────────────
+  @HostListener('document:click')
+  onDocumentClick() {
+    this.closeDropdowns();
+  }
+
+  // ── PAGINACIÓN ────────────────────────────────────────────────────────
 
   get totalPages(): number {
     return Math.ceil(this.reports.length / this.pageSize) || 1;
@@ -59,20 +71,19 @@ export class ActivityReportsComponent implements OnChanges {
     if (this.currentPage < this.totalPages) this.currentPage++;
   }
 
-  // ── CICLO DE VIDA ────────────────────────────────────────────────────
+  // ── CICLO DE VIDA ─────────────────────────────────────────────────────
 
   ngOnChanges() {
-    // Si terminó de guardar, cerrar edición
     if (!this.saving && !this.saveError && this.editingId !== null && this.successMsg) {
       this.editingId = null;
       this.editForm  = {};
     }
   }
 
-  // ── FILTROS ──────────────────────────────────────────────────────────
+  // ── FILTROS ───────────────────────────────────────────────────────────
 
   applyFilters() {
-    this.currentPage = 1; // resetear al filtrar
+    this.currentPage = 1;
     this.onFilterChange.emit({
       date:        this.filterDate       || undefined,
       operator_id: this.filterOperatorId || undefined,
@@ -82,11 +93,71 @@ export class ActivityReportsComponent implements OnChanges {
   }
 
   resetFilters() {
-    this.filterDate = this.filterOperatorId = this.filterProcessId = this.filterStatus = '';
+    this.filterDate        = new Date().toISOString().split('T')[0];
+    this.filterOperatorId  = '';
+    this.filterProcessId   = '';
+    this.filterStatus      = '';
+    this.operatorSearch    = '';
+    this.processSearch     = '';
     this.applyFilters();
   }
 
-  // ── EDICIÓN ──────────────────────────────────────────────────────────
+  // ── DROPDOWNS ─────────────────────────────────────────────────────────
+
+  get filteredOperators(): any[] {
+    const q = this.operatorSearch.toLowerCase().trim();
+    return q ? this.operators.filter(o => o.name.toLowerCase().includes(q)) : this.operators;
+  }
+
+  get filteredProcesses(): any[] {
+    const q = this.processSearch.toLowerCase().trim();
+    return q ? this.processes.filter(p => p.name.toLowerCase().includes(q)) : this.processes;
+  }
+
+  selectOperator(id: string) {
+    this.filterOperatorId    = id;
+    this.operatorDropdownOpen = false;
+    this.operatorSearch       = '';
+    this.applyFilters();
+  }
+
+  selectProcess(id: string) {
+    this.filterProcessId    = id;
+    this.processDropdownOpen = false;
+    this.processSearch       = '';
+    this.applyFilters();
+  }
+
+  clearOperator() {
+    this.filterOperatorId    = '';
+    this.operatorDropdownOpen = false;
+    this.operatorSearch       = '';
+    this.applyFilters();
+  }
+
+  clearProcess() {
+    this.filterProcessId    = '';
+    this.processDropdownOpen = false;
+    this.processSearch       = '';
+    this.applyFilters();
+  }
+
+  getOperatorName(): string {
+    if (!this.filterOperatorId) return 'Todos';
+    return this.operators.find(o => String(o.id) === String(this.filterOperatorId))?.name ?? 'Todos';
+  }
+
+  getProcessName(): string {
+    if (!this.filterProcessId) return 'Todos';
+    return this.processes.find(p => String(p.id) === String(this.filterProcessId))?.name ?? 'Todos';
+  }
+
+  closeDropdowns() {
+    this.operatorDropdownOpen = false;
+    this.processDropdownOpen  = false;
+  }
+
+  // ── EDICIÓN ───────────────────────────────────────────────────────────
 
   startEdit(report: any) {
     this.editingId = report.id;
@@ -113,7 +184,7 @@ export class ActivityReportsComponent implements OnChanges {
     this.expandedId = this.expandedId === id ? null : id;
   }
 
-  // ── HELPERS ──────────────────────────────────────────────────────────
+  // ── HELPERS ───────────────────────────────────────────────────────────
 
   toLocalInput(ts: string | null): string {
     if (!ts) return '';
@@ -147,8 +218,8 @@ export class ActivityReportsComponent implements OnChanges {
     return map[status] ?? '';
   }
 
-  get total()   { return this.reports.length; }
-  get nOpen()   { return this.reports.filter(r => r.status === 'OPEN').length; }
-  get nStopped(){ return this.reports.filter(r => r.status === 'STOPPED').length; }
-  get nClosed() { return this.reports.filter(r => r.status === 'CLOSED').length; }
+  get total()    { return this.reports.length; }
+  get nOpen()    { return this.reports.filter(r => r.status === 'OPEN').length; }
+  get nStopped() { return this.reports.filter(r => r.status === 'STOPPED').length; }
+  get nClosed()  { return this.reports.filter(r => r.status === 'CLOSED').length; }
 }

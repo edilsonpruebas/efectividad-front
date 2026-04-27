@@ -28,26 +28,80 @@
   </div>
 
   <!-- FILTROS -->
-  <div class="rp-filters">
+  <div class="rp-filters" (click)="$event.stopPropagation()">
+
     <label>Fecha
       <input type="date" class="rp-input" [(ngModel)]="filterDate" (change)="applyFilters()">
     </label>
+
+    <!-- OPERADOR -->
     <label>Operador
-      <select class="rp-select" [(ngModel)]="filterOperatorId" (change)="applyFilters()">
-        <option value="">Todos</option>
-        @for (op of operators; track op.id) {
-          <option [value]="op.id">{{ op.name }}</option>
+      <div class="rp-dropdown" [class.open]="operatorDropdownOpen">
+        <button class="rp-dropdown-trigger" type="button"
+                (click)="operatorDropdownOpen = !operatorDropdownOpen; processDropdownOpen = false">
+          <span>{{ getOperatorName() }}</span>
+          <span class="rp-dropdown-arrow">▾</span>
+        </button>
+        @if (operatorDropdownOpen) {
+          <div class="rp-dropdown-panel">
+            <input class="rp-dropdown-search" type="text"
+                   placeholder="Buscar operador…"
+                   [(ngModel)]="operatorSearch"
+                   (click)="$event.stopPropagation()">
+            <ul class="rp-dropdown-list">
+              <li (click)="clearOperator()"
+                  [class.selected]="!filterOperatorId">
+                Todos
+              </li>
+              @for (op of filteredOperators; track op.id) {
+                <li (click)="selectOperator(op.id)"
+                    [class.selected]="filterOperatorId == op.id">
+                  {{ op.name }}
+                </li>
+              }
+              @if (filteredOperators.length === 0) {
+                <li class="rp-dropdown-empty">Sin resultados</li>
+              }
+            </ul>
+          </div>
         }
-      </select>
+      </div>
     </label>
+
+    <!-- PROCESO -->
     <label>Proceso
-      <select class="rp-select" [(ngModel)]="filterProcessId" (change)="applyFilters()">
-        <option value="">Todos</option>
-        @for (p of processes; track p.id) {
-          <option [value]="p.id">{{ p.name }}</option>
+      <div class="rp-dropdown" [class.open]="processDropdownOpen">
+        <button class="rp-dropdown-trigger" type="button"
+                (click)="processDropdownOpen = !processDropdownOpen; operatorDropdownOpen = false">
+          <span>{{ getProcessName() }}</span>
+          <span class="rp-dropdown-arrow">▾</span>
+        </button>
+        @if (processDropdownOpen) {
+          <div class="rp-dropdown-panel">
+            <input class="rp-dropdown-search" type="text"
+                   placeholder="Buscar proceso…"
+                   [(ngModel)]="processSearch"
+                   (click)="$event.stopPropagation()">
+            <ul class="rp-dropdown-list">
+              <li (click)="clearProcess()"
+                  [class.selected]="!filterProcessId">
+                Todos
+              </li>
+              @for (p of filteredProcesses; track p.id) {
+                <li (click)="selectProcess(p.id)"
+                    [class.selected]="filterProcessId == p.id">
+                  {{ p.name }}
+                </li>
+              }
+              @if (filteredProcesses.length === 0) {
+                <li class="rp-dropdown-empty">Sin resultados</li>
+              }
+            </ul>
+          </div>
         }
-      </select>
+      </div>
     </label>
+
     <label>Estado
       <select class="rp-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
         <option value="">Todos</option>
@@ -57,9 +111,11 @@
         <option value="CANCELLED">Cancelada</option>
       </select>
     </label>
+
     <div class="filter-actions">
       <button class="btn btn-ghost btn-sm" (click)="resetFilters()">Limpiar</button>
     </div>
+
   </div>
 
   <!-- TABLA -->
@@ -199,12 +255,10 @@
                   [disabled]="currentPage === 1">
             ← Anterior
           </button>
-
           <span class="rp-page-info">
             Página {{ currentPage }} de {{ totalPages }}
             <span class="muted sm">({{ reports.length }} registros)</span>
           </span>
-
           <button class="btn btn-ghost btn-sm"
                   (click)="nextPage()"
                   [disabled]="currentPage === totalPages">
