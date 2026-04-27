@@ -9,6 +9,7 @@ import { ActivityDashboardContainerComponent } from './Activities/pages/activity
 import { EfectividadDashboardContainerComponent } from './efectividad/pages/efectividad-dashboard-container/efectividad-dashboard-container';
 import { ManualReportContainerComponent } from './Activities/pages/manual-report-container/manual-report-container';
 import { EfectividadAdminContainerComponent } from './efectividad/pages/efectividad-admin-container/efectividad-admin-container';
+import { ActivityReportsContainerComponent } from './edit-reports/pages/activity-reports-container/activity-reports-container';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -25,6 +26,7 @@ export const routes: Routes = [
       { path: 'reports/efectividad', component: EfectividadDashboardContainerComponent, canActivate: [adminGuard] },
       { path: 'reports/manual',      component: ManualReportContainerComponent,          canActivate: [adminGuard] },
       { path: 'admin/efectividad',   component: EfectividadAdminContainerComponent,      canActivate: [adminGuard] },
+      { path: 'reports/history', component: ActivityReportsContainerComponent, canActivate: [adminGuard] },
     ]
   },
   { path: '**', redirectTo: '' }

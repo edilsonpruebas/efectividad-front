@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EfectividadDashboardComponent } from '../../components/efectividad-dashboard/efectividad-dashboard';
 import { EfectividadService, EfectividadFilter } from '../../services/efectividad';
 import { Subject, takeUntil } from 'rxjs';
@@ -6,7 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-efectividad-dashboard-container',
   standalone: true,
-  imports: [EfectividadDashboardComponent], // ✅ Solo el dashboard, sin admin
+  imports: [EfectividadDashboardComponent],
   template: `
     <app-efectividad-dashboard
       [activities]="activities"
@@ -30,34 +30,46 @@ export class EfectividadDashboardContainerComponent implements OnInit, OnDestroy
 
   private destroy$ = new Subject<void>();
 
-  constructor(private service: EfectividadService) {}
+  constructor(
+    private service: EfectividadService,
+    private cdr: ChangeDetectorRef  // ←
+  ) {}
 
   ngOnInit() {
-    // Cargar operadores activos (para filtros del dashboard)
     this.service.getOperators()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({ next: d => this.operators = d });
+      .subscribe({
+        next: d => {
+          this.operators = d;
+          this.cdr.detectChanges(); // ←
+        }
+      });
 
-    // Cargar procesos (para filtros del dashboard)
     this.service.getProcesses()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({ next: d => this.processes = d });
+      .subscribe({
+        next: d => {
+          this.processes = d;
+          this.cdr.detectChanges(); // ←
+        }
+      });
 
-    // Suscribirse a los datos del dashboard
     this.service.data$
       .pipe(takeUntil(this.destroy$))
       .subscribe(data => {
         this.activities    = data.activities    ?? [];
         this.metrics       = data.metrics       ?? {};
         this.effectiveness = data.effectiveness ?? { by_operator: [], by_process: [] };
+        this.cdr.detectChanges(); // ←
       });
 
-    // Suscribirse al estado de carga
     this.service.loading$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(l => this.loading = l);
+      .subscribe(l => {
+        this.loading = l;
+        this.cdr.detectChanges(); // ←
+      });
 
-    // Iniciar polling de datos
     this.service.startPolling();
   }
 

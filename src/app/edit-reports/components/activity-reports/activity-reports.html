@@ -1,0 +1,219 @@
+<div class="rp-root">
+
+  <!-- ALERTS -->
+  @if (successMsg) {
+    <div class="alert alert-success">✓ {{ successMsg }}</div>
+  }
+  @if (error) {
+    <div class="alert alert-error">⚠ {{ error }}</div>
+  }
+
+  <!-- HEADER -->
+  <div class="rp-header">
+    <div>
+      <h2 class="rp-title">Reportes de Actividades</h2>
+      <p class="rp-subtitle">{{ total }} registros encontrados</p>
+    </div>
+    <button class="btn btn-ghost" (click)="applyFilters()" [disabled]="loading">
+      ↻ Actualizar
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="rp-stats">
+    <div class="stat-card"><span class="stat-val">{{ total }}</span><span class="stat-lbl">Total</span></div>
+    <div class="stat-card open"><span class="stat-val">{{ nOpen }}</span><span class="stat-lbl">Abiertas</span></div>
+    <div class="stat-card stopped"><span class="stat-val">{{ nStopped }}</span><span class="stat-lbl">Detenidas</span></div>
+    <div class="stat-card closed"><span class="stat-val">{{ nClosed }}</span><span class="stat-lbl">Cerradas</span></div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="rp-filters">
+    <label>Fecha
+      <input type="date" class="rp-input" [(ngModel)]="filterDate" (change)="applyFilters()">
+    </label>
+    <label>Operador
+      <select class="rp-select" [(ngModel)]="filterOperatorId" (change)="applyFilters()">
+        <option value="">Todos</option>
+        @for (op of operators; track op.id) {
+          <option [value]="op.id">{{ op.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Proceso
+      <select class="rp-select" [(ngModel)]="filterProcessId" (change)="applyFilters()">
+        <option value="">Todos</option>
+        @for (p of processes; track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Estado
+      <select class="rp-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+        <option value="">Todos</option>
+        <option value="OPEN">Abierta</option>
+        <option value="STOPPED">Detenida</option>
+        <option value="CLOSED">Cerrada</option>
+        <option value="CANCELLED">Cancelada</option>
+      </select>
+    </label>
+    <div class="filter-actions">
+      <button class="btn btn-ghost btn-sm" (click)="resetFilters()">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="rp-table-wrap">
+    @if (loading) {
+      <div class="rp-empty"><span class="spinner"></span> Cargando...</div>
+    } @else if (reports.length === 0) {
+      <div class="rp-empty">No hay reportes con los filtros seleccionados.</div>
+    } @else {
+      <table class="rp-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>#</th>
+            <th>Operador</th>
+            <th>Proceso</th>
+            <th>Estado</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Duración</th>
+            <th>Cantidad</th>
+            <th>Enviado por</th>
+            <th>Fecha envío</th>
+            <th>Observación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of paginatedReports; track r.id) {
+
+            <!-- FILA PRINCIPAL -->
+            <tr [class.editing]="editingId === r.id">
+              <td>
+                <button class="icon-btn" (click)="toggleExpand(r.id)">
+                  {{ expandedId === r.id ? '▲' : '▼' }}
+                </button>
+              </td>
+              <td class="mono">{{ r.id }}</td>
+              <td>{{ r.operator?.name ?? '—' }}</td>
+              <td>
+                {{ r.process?.name ?? '—' }}
+                @if (r.is_group_member) {
+                  <span class="badge badge-group">grupo</span>
+                }
+              </td>
+              <td><span class="badge" [ngClass]="statusClass(r.status)">{{ statusLabel(r.status) }}</span></td>
+              <td class="mono">{{ fmt(r.start_time) }}</td>
+              <td class="mono">{{ fmt(r.end_time) }}</td>
+              <td class="mono">{{ duration(r.start_time, r.end_time) }}</td>
+              <td class="mono bold">{{ r.quantity ?? '—' }}</td>
+              <td class="muted">{{ r.supervisor?.name ?? '—' }}</td>
+              <td class="mono sm">{{ fmt(r.created_at) }}</td>
+              <td class="note-cell">{{ r.notes ? (r.notes.length > 40 ? (r.notes | slice:0:40) + '…' : r.notes) : '—' }}</td>
+              <td>
+                @if (editingId === r.id) {
+                  <span class="muted sm">editando…</span>
+                } @else {
+                  <button class="btn btn-ghost btn-sm" (click)="startEdit(r)">✏ Editar</button>
+                }
+              </td>
+            </tr>
+
+            <!-- FILA EDICIÓN -->
+            @if (editingId === r.id) {
+              <tr class="edit-row">
+                <td colspan="13">
+                  <div class="edit-grid">
+                    <label>Operador
+                      <select class="rp-select" [(ngModel)]="editForm.operator_id">
+                        @for (op of operators; track op.id) {
+                          <option [value]="op.id">{{ op.name }}</option>
+                        }
+                      </select>
+                    </label>
+                    <label>Proceso
+                      <select class="rp-select" [(ngModel)]="editForm.process_id">
+                        @for (p of processes; track p.id) {
+                          <option [value]="p.id">{{ p.name }}</option>
+                        }
+                      </select>
+                    </label>
+                    <label>Inicio
+                      <input type="datetime-local" class="rp-input" [(ngModel)]="editForm.start_time">
+                    </label>
+                    <label>Fin
+                      <input type="datetime-local" class="rp-input" [(ngModel)]="editForm.end_time">
+                    </label>
+                    <label>Cantidad
+                      <input type="number" min="0" class="rp-input" [(ngModel)]="editForm.quantity">
+                    </label>
+                  </div>
+                  <label class="full-width">Observación
+                    <textarea class="rp-input" rows="2" maxlength="1000" [(ngModel)]="editForm.notes"></textarea>
+                  </label>
+                  <div class="edit-actions">
+                    <button class="btn btn-success btn-sm" (click)="saveEdit(r)" [disabled]="saving">
+                      @if (saving) { <span class="spinner sm"></span> } @else { ✓ }
+                      Guardar
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="cancelEdit()" [disabled]="saving">✕ Cancelar</button>
+                    @if (saveError) {
+                      <span class="save-error">⚠ {{ saveError }}</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+
+            <!-- FILA EXPANDIDA -->
+            @if (expandedId === r.id && editingId !== r.id) {
+              <tr class="expand-row">
+                <td colspan="13">
+                  <div class="expand-panel">
+                    <div class="exp-item"><span class="exp-l">ID</span><span class="exp-v">#{{ r.id }}</span></div>
+                    <div class="exp-item"><span class="exp-l">Grupo</span><span class="exp-v">{{ r.activity_group_id ? 'Grupo #' + r.activity_group_id : 'Individual' }}</span></div>
+                    <div class="exp-item"><span class="exp-l">Base / hora</span><span class="exp-v">{{ r.process?.base_per_hour ?? '—' }}</span></div>
+                    <div class="exp-item"><span class="exp-l">Supervisor</span><span class="exp-v">{{ r.supervisor?.name ?? '—' }}</span></div>
+                    <div class="exp-item"><span class="exp-l">Creado</span><span class="exp-v mono">{{ fmt(r.created_at) }}</span></div>
+                    <div class="exp-item"><span class="exp-l">Actualizado</span><span class="exp-v mono">{{ fmt(r.updated_at) }}</span></div>
+                    @if (r.notes) {
+                      <div class="exp-item full"><span class="exp-l">Observación</span><span class="exp-v">{{ r.notes }}</span></div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+
+          }
+        </tbody>
+      </table>
+
+      <!-- PAGINACIÓN -->
+      @if (totalPages > 1) {
+        <div class="rp-pagination">
+          <button class="btn btn-ghost btn-sm"
+                  (click)="prevPage()"
+                  [disabled]="currentPage === 1">
+            ← Anterior
+          </button>
+
+          <span class="rp-page-info">
+            Página {{ currentPage }} de {{ totalPages }}
+            <span class="muted sm">({{ reports.length }} registros)</span>
+          </span>
+
+          <button class="btn btn-ghost btn-sm"
+                  (click)="nextPage()"
+                  [disabled]="currentPage === totalPages">
+            Siguiente →
+          </button>
+        </div>
+      }
+
+    }
+  </div>
+
+</div>
