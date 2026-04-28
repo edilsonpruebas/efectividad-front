@@ -38,7 +38,9 @@ export class EfectividadSummaryComponent {
       const total_standard = consolidatedActivities.reduce((sum: number, a: any) => sum + (a.standard || 0), 0);
       const total_real = consolidatedActivities.reduce((sum: number, a: any) => sum + (a.real || 0), 0);
       const effectiveness = total_standard > 0 ? Math.round((total_real / total_standard) * 100) : null;
-      const weighted_effectiveness = this.calculateWeightedEffectiveness(consolidatedActivities);
+
+      // ✅ FIX: Usa el valor correcto del backend en lugar de recalcular con peso por estándar
+      const weighted_effectiveness = op.weighted_effectiveness ?? this.calculateWeightedEffectiveness(consolidatedActivities);
 
       const total_time = consolidatedActivities.reduce(
         (acc: any, a: any) => this.sumTimes(acc, a.time),
@@ -119,58 +121,50 @@ export class EfectividadSummaryComponent {
     }));
   }
 
+  // ✅ Fallback: calcula ponderado por TIEMPO (igual que Excel) en caso de que el backend no lo envíe
   private calculateWeightedEffectiveness(activities: any[]): number | null {
-    const total_standard = activities.reduce((s, a) => s + (a.standard || 0), 0);
-    if (total_standard === 0) return null;
+    const totalSeconds = activities.reduce((s, a) => s + this.timeToSeconds(a.time), 0);
+    if (totalSeconds === 0) return null;
 
     const weighted = activities.reduce((s, a) => {
-      const eff = a.standard > 0 ? (a.real / a.standard) * 100 : 0;
-      return s + eff * (a.standard / total_standard);
+      const eff  = a.standard > 0 ? (a.real / a.standard) : 0;
+      const peso = this.timeToSeconds(a.time) / totalSeconds; // ✅ peso por TIEMPO
+      return s + eff * peso;
     }, 0);
 
-    return Math.round(weighted);
+    return Math.round(weighted * 100);
   }
 
-  private sumTimes(t1: any, t2: any): string {
-  const toSeconds = (t: any): number => {
-    if (t === null || t === undefined || t === '—' || t === '') return 0;
+  private timeToSeconds(t: any): number {
+    if (!t || t === '—' || t === '') return 0;
 
     if (typeof t === 'number') return t;
 
     const str = String(t).trim();
 
-    // Formato "1h 0min" o "1h 30min" o "2h" o "45min"
     const humanMatch = str.match(/^(?:(\d+)h)?\s*(?:(\d+)min)?$/);
     if (humanMatch && (humanMatch[1] || humanMatch[2])) {
-      const hours = parseInt(humanMatch[1] || '0');
-      const mins  = parseInt(humanMatch[2] || '0');
-      return hours * 3600 + mins * 60;
+      return parseInt(humanMatch[1] || '0') * 3600 + parseInt(humanMatch[2] || '0') * 60;
     }
 
-    // Formato HH:MM:SS
     const hms = str.match(/^(\d+):(\d{2}):(\d{2})$/);
     if (hms) return parseInt(hms[1]) * 3600 + parseInt(hms[2]) * 60 + parseInt(hms[3]);
 
-    // Formato HH:MM
     const hm = str.match(/^(\d+):(\d{2})$/);
     if (hm) return parseInt(hm[1]) * 3600 + parseInt(hm[2]) * 60;
 
-    // Formato "90m" o "90min"
-    const minOnly = str.match(/^(\d+)\s*m/i);
-    if (minOnly) return parseInt(minOnly[1]) * 60;
-
     return 0;
-  };
+  }
 
-  const total = toSeconds(t1) + toSeconds(t2);
-  if (total === 0) return '—';
+  private sumTimes(t1: any, t2: any): string {
+    const total = this.timeToSeconds(t1) + this.timeToSeconds(t2);
+    if (total === 0) return '—';
 
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
 
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-}
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
 
   sortAsc() { this.sortDirection = 'asc'; this.currentPageOperator = 1; }
   sortDesc() { this.sortDirection = 'desc'; this.currentPageOperator = 1; }
