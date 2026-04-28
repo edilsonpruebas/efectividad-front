@@ -1,5 +1,4 @@
 <div class="report-wrapper">
-
   <div class="report-header">
     <div class="header-icon">📝</div>
     <div class="header-content">
@@ -18,7 +17,7 @@
   </div>
 
   <div class="report-form">
-
+    <!-- INFORMACIÓN GENERAL -->
     <div class="form-section">
       <div class="section-title">
         <span class="section-icon">👤</span>
@@ -26,12 +25,8 @@
       </div>
 
       <div class="mode-toggle" style="margin-bottom: 1rem;">
-        <button type="button" [class.active]="!isGroup" (click)="switchMode(false)">
-          👤 Individual
-        </button>
-        <button type="button" [class.active]="isGroup" (click)="switchMode(true)">
-          👥 Grupal
-        </button>
+        <button type="button" [class.active]="!isGroup" (click)="switchMode(false)">👤 Individual</button>
+        <button type="button" [class.active]="isGroup" (click)="switchMode(true)">👥 Grupal</button>
       </div>
 
       <div class="form-row">
@@ -107,6 +102,7 @@
       </div>
     </div>
 
+    <!-- CORTES DE PRODUCCIÓN -->
     <div class="form-section highlight">
       <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
@@ -125,9 +121,7 @@
         <div style="font-size: 0.85rem; color: #4b5563; font-weight: bold; margin-bottom: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.5rem;">
           <span>Corte #{{ i + 1 }}</span>
           <button *ngIf="cortes.length > 1" type="button" (click)="removeCorte(i)"
-                  style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem;">
-            ✕
-          </button>
+                  style="background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem;">✕</button>
         </div>
 
         <div class="form-row">
@@ -141,6 +135,23 @@
           </div>
         </div>
 
+        <!-- ⏱️ Duración por corte -->
+        <div *ngIf="getCorteMinutes(corte) > 0" 
+             style="margin-top: 0.3rem; font-size: 0.8rem; color: #64748b; font-style: italic;">
+          ⏱️ Duración: {{ formatDuration(getCorteMinutes(corte)) }}
+        </div>
+
+        <!-- ✅ Validaciones optimizadas (evita doble ejecución) -->
+        <ng-container *ngIf="getCorteTimeError(corte) as timeMsg">
+          <div class="corte-error-message">⚠️ {{ timeMsg }}</div>
+        </ng-container>
+        <ng-container *ngIf="getCorteOverlapError(corte, i) as overlapMsg">
+          <div class="corte-error-message overlap">🔀 {{ overlapMsg }}</div>
+        </ng-container>       
+        <ng-container *ngIf="getCorteLimitError(corte) as limitMsg">
+          <div class="corte-error-message limit">🚫 {{ limitMsg }}</div>
+        </ng-container>
+
         <div class="form-row single" style="margin-top: 0.5rem;">
           <div class="form-group required">
             <label>Cantidad producida en este corte <span class="required-mark">*</span></label>
@@ -150,29 +161,22 @@
             </div>
           </div>
         </div>
-
-        <!-- Duración del corte -->
-        <div *ngIf="getCorteMinutes(corte) > 0"
-             [style.background]="corteExceedsLimit(corte) ? '#fef2f2' : '#f0fdf4'"
-             [style.color]="corteExceedsLimit(corte) ? '#991b1b' : '#166534'"
-             [style.border]="corteExceedsLimit(corte) ? '1px solid #fecaca' : '1px solid #bbf7d0'"
-             style="margin-top: 0.6rem; padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem;">
-          <span>{{ corteExceedsLimit(corte) ? '⚠️' : '⏱️' }}</span>
-          <span>
-            Duración: <strong>{{ formatDuration(getCorteMinutes(corte)) }}</strong>
-            <span *ngIf="corteExceedsLimit(corte)"> — Este corte supera las 4 horas permitidas</span>
-          </span>
-        </div>
-
       </div>
 
-      <div *ngIf="getTotalQuantity() > 0" 
-           style="background: #f0fdf4; color: #166534; padding: 0.8rem; border-radius: 6px; border: 1px solid #bbf7d0; display: flex; justify-content: flex-end; gap: 1.5rem; font-size: 0.95rem;">
-        <span>Total acumulado: <strong>{{ getTotalQuantity() }} unidades</strong></span>
-        <span *ngIf="getTotalMinutes() > 0">⏱️ <strong>{{ formatDuration(getTotalMinutes()) }}</strong></span>
+      <!-- ⏱️ Tiempo total acumulado -->
+      <div *ngIf="getTotalMinutes() > 0" 
+           style="background: #f1f5f9; color: #334155; padding: 0.6rem 0.8rem; border-radius: 6px; margin-top: 0.5rem; text-align: right; font-size: 0.9rem;">
+        ⏱️ Tiempo total acumulado: <strong>{{ formatDuration(getTotalMinutes()) }}</strong>
+      </div>
+
+      <!-- Total unidades -->
+      <div *ngIf="cortes.length > 1 && getTotalQuantity() > 0" 
+           style="background: #f0fdf4; color: #166534; padding: 0.8rem; border-radius: 6px; border: 1px solid #bbf7d0; text-align: right; font-size: 0.95rem; margin-top: 0.5rem;">
+        Total acumulado: <strong>{{ getTotalQuantity() }} unidades</strong>
       </div>
     </div>
 
+    <!-- OBSERVACIONES -->
     <div class="form-section">
       <div class="section-title">
         <span class="section-icon">💬</span>
@@ -185,6 +189,7 @@
       </div>
     </div>
 
+    <!-- ACCIONES -->
     <div class="form-actions">
       <button (click)="submit()" class="btn-submit" [disabled]="loading || !isFormValid()" [class.ready]="isFormValid() && !loading">
         <span class="btn-icon" *ngIf="!loading">💾</span>
@@ -195,6 +200,5 @@
         Completa todos los campos obligatorios (*)
       </span>
     </div>
-
   </div>
 </div>
