@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivityService } from '../../services/activity';
 import { ManualReportComponent } from '../../components/manual-report/manual-report';
+import { forkJoin } from 'rxjs'; // ⬅️ Importación requerida
 
 @Component({
   selector: 'app-manual-report-container',
@@ -20,30 +21,28 @@ export class ManualReportContainerComponent implements OnInit {
   constructor(private activityService: ActivityService) {}
 
   ngOnInit() {
-    this.activityService.getOperators()
-      .subscribe(data => this.operators = data);
-
-    this.activityService.getProcesses()
-      .subscribe(data => this.processes = data);
+    this.activityService.getOperators().subscribe(data => this.operators = data);
+    this.activityService.getProcesses().subscribe(data => this.processes = data);
   }
 
-  submitManualReport(form: any) {
-    console.log('1. submitManualReport llamado', form);
+  // Recibe un arreglo de payloads
+  submitManualReport(payloads: any[]) {
+    // Mapeamos el arreglo de datos a un arreglo de peticiones HTTP (Observables)
+    const requests = payloads.map(payload => 
+      this.activityService.reportManual(payload)
+    );
 
-    this.activityService.reportManual(form).subscribe({
-      next: (res) => {
-        console.log('2. next ejecutado', res);
-        console.log('3. manualReportRef existe?', !!this.manualReportRef);
+    // forkJoin ejecuta todas las peticiones en paralelo
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        // Se ejecuta solo si TODOS los cortes se guardaron correctamente en la BD
         this.manualReportRef?.markSuccess();
-        console.log('4. markSuccess llamado');
       },
       error: (e) => {
-        console.log('2. error ejecutado', e);
-        console.log('3. manualReportRef existe?', !!this.manualReportRef);
+        // Si falla aunque sea un corte, se captura el error
         this.manualReportRef?.markError(
-          e.error?.error ?? 'Error al registrar el reporte'
+          e.error?.error ?? 'Error al registrar uno o más cortes en la base de datos.'
         );
-        console.log('4. markError llamado');
       }
     });
   }

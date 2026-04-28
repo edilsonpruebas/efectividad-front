@@ -17,6 +17,12 @@ export class ClickOutsideDirective {
   }
 }
 
+interface Corte {
+  start_time: string;
+  end_time: string;
+  quantity: number | null;
+}
+
 @Component({
   selector: 'app-manual-report',
   standalone: true,
@@ -26,216 +32,180 @@ export class ClickOutsideDirective {
 })
 export class ManualReportComponent {
 
-  @Input() operators: any[] = [];
-  @Input() processes: any[] = [];
-  @Output() onSubmit = new EventEmitter<any>();
+    @Input() operators: any[] = [];
+    @Input() processes: any[] = [];
+    @Output() onSubmit = new EventEmitter<any[]>();
 
-  success = false;
-  error   = '';
-  loading = false;
+    success = false;
+    error   = '';
+    loading = false;
+    isGroup = false;
 
-  isGroup = false;
+    operatorDropdownOpen = false;
+    processDropdownOpen  = false;
+    operatorSearchTerm   = '';
+    processSearchTerm    = '';
 
-  operatorDropdownOpen = false;
-  processDropdownOpen  = false;
-  operatorSearchTerm   = '';
-  processSearchTerm    = '';
+    selectedGroupOperators: any[] = [];
+    selectedOperatorName = '';
+    selectedProcessName  = '';
+    
+    private loadingTimeout: any;
 
-  selectedGroupOperators: any[] = [];
-
-  private loadingTimeout: any;
-
-  form = {
-    operator_id:  null as number | null,
-    process_id:   null as number | null,
-    start_time:   '',
-    end_time:     '',
-    quantity:     null as number | null,
-    notes:        ''
-  };
-
-  constructor(private cdr: ChangeDetectorRef) {}
-
-  // ── GETTERS ───────────────────────────────────────────────────────────
-
-  get filteredOperators() {
-    const base = this.isGroup
-      ? this.operators.filter(op => !this.selectedGroupOperators.find(s => s.id === op.id))
-      : this.operators;
-    if (!this.operatorSearchTerm) return base;
-    const term = this.operatorSearchTerm.toLowerCase();
-    return base.filter(op => op.name.toLowerCase().includes(term));
-  }
-
-  get filteredProcesses() {
-    if (!this.processSearchTerm) return this.processes;
-    const term = this.processSearchTerm.toLowerCase();
-    return this.processes.filter(pr => pr.name.toLowerCase().includes(term));
-  }
-
-  get selectedOperatorName(): string {
-    const op = this.operators.find(o => o.id === this.form.operator_id);
-    return op ? op.name : '';
-  }
-
-  get selectedProcessName(): string {
-    const pr = this.processes.find(p => p.id === this.form.process_id);
-    return pr ? pr.name : '';
-  }
-
-  // ── MODO ──────────────────────────────────────────────────────────────
-
-  switchMode(group: boolean) {
-    this.isGroup              = group;
-    this.form.operator_id     = null;
-    this.selectedGroupOperators = [];
-    this.operatorSearchTerm   = '';
-    this.operatorDropdownOpen = false;
-  }
-
-  // ── DROPDOWNS ─────────────────────────────────────────────────────────
-
-  toggleOperatorDropdown() {
-    this.operatorDropdownOpen = !this.operatorDropdownOpen;
-    this.processDropdownOpen  = false;
-    if (this.operatorDropdownOpen) this.operatorSearchTerm = '';
-  }
-
-  toggleProcessDropdown() {
-    this.processDropdownOpen  = !this.processDropdownOpen;
-    this.operatorDropdownOpen = false;
-    if (this.processDropdownOpen) this.processSearchTerm = '';
-  }
-
-  selectOperator(op: any) {
-    this.form.operator_id     = op.id;
-    this.operatorDropdownOpen = false;
-    this.operatorSearchTerm   = '';
-    this.cdr.markForCheck();
-  }
-
-  selectProcess(pr: any) {
-    this.form.process_id     = pr.id;
-    this.processDropdownOpen = false;
-    this.processSearchTerm   = '';
-    this.cdr.markForCheck();
-  }
-
-  // ── GRUPO ─────────────────────────────────────────────────────────────
-
-  addOperatorToGroup(op: any) {
-    if (!this.selectedGroupOperators.find(o => o.id === op.id)) {
-      this.selectedGroupOperators.push(op);
-    }
-    this.operatorDropdownOpen = false;
-    this.operatorSearchTerm   = '';
-    this.cdr.markForCheck();
-  }
-
-  removeOperatorFromGroup(opId: number) {
-    this.selectedGroupOperators = this.selectedGroupOperators.filter(o => o.id !== opId);
-    this.cdr.markForCheck();
-  }
-
-  // ── VALIDACIÓN ────────────────────────────────────────────────────────
-
-  isFormValid(): boolean {
-    const base = !!this.form.process_id &&
-                 !!this.form.start_time &&
-                 !!this.form.end_time   &&
-                 !!this.form.quantity   &&
-                 this.form.quantity > 0;
-
-    if (this.isGroup) {
-      return base && this.selectedGroupOperators.length >= 2;
-    }
-    return base && !!this.form.operator_id;
-  }
-
-  calculateDuration(): string {
-    if (!this.form.start_time || !this.form.end_time) return '';
-    const start       = new Date(this.form.start_time);
-    const end         = new Date(this.form.end_time);
-    const diffMinutes = (end.getTime() - start.getTime()) / 1000 / 60;
-    if (diffMinutes < 0)  return 'Verificar fechas';
-    if (diffMinutes === 0) return '0 minutos';
-    if (diffMinutes < 60) return `${Math.round(diffMinutes)} minutos`;
-    const hours = Math.floor(diffMinutes / 60);
-    const mins  = Math.round(diffMinutes % 60);
-    return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
-  }
-
-  // ── SUBMIT ────────────────────────────────────────────────────────────
-
-  submit() {
-    this.success = false;
-    this.error   = '';
-
-    if (this.form.end_time && this.form.start_time &&
-        new Date(this.form.end_time) <= new Date(this.form.start_time)) {
-      this.error = 'La hora final debe ser posterior a la hora de inicio.';
-      this.cdr.markForCheck();
-      return;
-    }
-
-    this.loading = true;
-    this.cdr.markForCheck();
-
-    this.loadingTimeout = setTimeout(() => {
-      if (this.loading) {
-        this.loading = false;
-        this.error   = 'La operación está tomando más tiempo de lo esperado. Intente nuevamente.';
-        this.cdr.markForCheck();
-      }
-    }, 10000);
-
-    if (this.isGroup) {
-      this.onSubmit.emit({
-        is_group:     true,
-        operator_ids: this.selectedGroupOperators.map(o => o.id),
-        process_id:   this.form.process_id,
-        start_time:   this.form.start_time,
-        end_time:     this.form.end_time,
-        quantity:     this.form.quantity,
-        notes:        this.form.notes,
-      });
-    } else {
-      this.onSubmit.emit({ ...this.form, is_group: false });
-    }
-  }
-
-  markSuccess() {
-    this.clearLoadingTimeout();
-    this.loading  = false;
-    this.success  = true;
-    this.isGroup  = false;
-    this.selectedGroupOperators = [];
-    this.form = {
-      operator_id: null,
-      process_id:  null,
-      start_time:  '',
-      end_time:    '',
-      quantity:    null,
-      notes:       ''
+    form = {
+      operator_id:  null as number | null,
+      process_id:   null as number | null,
+      notes:        ''
     };
-    this.operatorDropdownOpen = false;
-    this.processDropdownOpen  = false;
-    this.operatorSearchTerm   = '';
-    this.processSearchTerm    = '';
-    this.cdr.markForCheck();
-  }
 
-  markError(msg: string) {
-    this.clearLoadingTimeout();
-    this.loading = false;
-    this.error   = msg;
-    this.cdr.markForCheck();
-  }
+    cortes: Corte[] = [{ start_time: '', end_time: '', quantity: null }];
 
-  private clearLoadingTimeout() {
-    if (this.loadingTimeout) {
-      clearTimeout(this.loadingTimeout);
-      this.loadingTimeout = null;
+    constructor(private cdr: ChangeDetectorRef) {}
+
+    // --- GETTERS PARA FILTRADO ---
+    get filteredOperators() {
+      return this.operators.filter(op => 
+        op.name.toLowerCase().includes(this.operatorSearchTerm.toLowerCase())
+      );
     }
+
+    get filteredProcesses() {
+      return this.processes.filter(pr => 
+        pr.name.toLowerCase().includes(this.processSearchTerm.toLowerCase())
+      );
+    }
+
+    // --- GESTIÓN DE DROPDOWNS Y SELECCIÓN ---
+    switchMode(group: boolean) {
+      this.isGroup = group;
+      this.form.operator_id = null;
+      this.selectedOperatorName = '';
+      this.selectedGroupOperators = [];
+    }
+
+    toggleOperatorDropdown() { this.operatorDropdownOpen = !this.operatorDropdownOpen; }
+    toggleProcessDropdown() { this.processDropdownOpen = !this.processDropdownOpen; }
+
+    selectOperator(op: any) {
+      this.form.operator_id = op.id;
+      this.selectedOperatorName = op.name;
+      this.operatorDropdownOpen = false;
+    }
+
+    selectProcess(pr: any) {
+      this.form.process_id = pr.id;
+      this.selectedProcessName = pr.name;
+      this.processDropdownOpen = false;
+    }
+
+    addOperatorToGroup(op: any) {
+      if (!this.selectedGroupOperators.find(o => o.id === op.id)) {
+        this.selectedGroupOperators.push(op);
+      }
+      this.operatorDropdownOpen = false;
+    }
+
+    removeOperatorFromGroup(id: number) {
+      this.selectedGroupOperators = this.selectedGroupOperators.filter(o => o.id !== id);
+    }
+
+    // --- LÓGICA DE CORTES ---
+    addCorte() {
+      this.cortes.push({ start_time: '', end_time: '', quantity: null });
+    }
+
+    removeCorte(index: number) {
+      if (this.cortes.length > 1) this.cortes.splice(index, 1);
+    }
+
+    getTotalQuantity(): number {
+      return this.cortes.reduce((acc, corte) => acc + (corte.quantity || 0), 0);
+    }
+
+    // --- VALIDACIÓN Y ENVÍO ---
+    isFormValid(): boolean {
+  const hasProcess = !!this.form.process_id;
+  const areCortesValid = this.cortes.every(c =>
+    c.start_time && c.end_time && c.quantity && c.quantity > 0
+  );
+  const hasOperators = this.isGroup
+    ? this.selectedGroupOperators.length >= 2
+    : !!this.form.operator_id;
+  const noCorteExceedsLimit = !this.hasAnyCorteExceedingLimit();
+
+  return hasProcess && areCortesValid && hasOperators && noCorteExceedsLimit;
+}
+
+    submit() {
+      this.success = false;
+      this.error = '';
+      this.loading = true;
+
+      const formatDate = (ds: string) => {
+        const d = new Date(ds);
+        const p = (n: number) => n.toString().padStart(2, '0');
+        return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:00`;
+      };
+
+      const payloads = this.cortes.map(c => ({
+        process_id: this.form.process_id,
+        start_time: formatDate(c.start_time),
+        end_time: formatDate(c.end_time),
+        quantity: c.quantity,
+        notes: this.form.notes,
+        is_group: this.isGroup,
+        operator_id: this.isGroup ? null : this.form.operator_id,
+        operator_ids: this.isGroup ? this.selectedGroupOperators.map(o => o.id) : null
+      }));
+
+      this.onSubmit.emit(payloads);
+    }
+
+    markSuccess() {
+      this.loading = false;
+      this.success = true;
+      this.form = { operator_id: null, process_id: null, notes: '' };
+      this.cortes = [{ start_time: '', end_time: '', quantity: null }];
+      this.selectedOperatorName = '';
+      this.selectedProcessName = '';
+      this.selectedGroupOperators = [];
+      this.cdr.markForCheck();
+    }
+
+    markError(msg: string) {
+      this.loading = false;
+      this.error = msg;
+      this.cdr.markForCheck();
+    }
+
+      // --- CÁLCULO DE DURACIÓN ---
+  getCorteMinutes(corte: Corte): number {
+    if (!corte.start_time || !corte.end_time) return 0;
+    const start = new Date(corte.start_time).getTime();
+    const end = new Date(corte.end_time).getTime();
+    const diff = (end - start) / 60000; // en minutos
+    return diff > 0 ? diff : 0;
+  }
+
+  formatDuration(minutes: number): string {
+    if (minutes <= 0) return '';
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    if (h === 0) return `${m} min`;
+    if (m === 0) return `${h} h`;
+    return `${h} h ${m} min`;
+  }
+
+  getTotalMinutes(): number {
+    return this.cortes.reduce((acc, c) => acc + this.getCorteMinutes(c), 0);
+  }
+
+  corteExceedsLimit(corte: Corte): boolean {
+    return this.getCorteMinutes(corte) > 240; // 4 horas = 240 minutos
+  }
+
+  hasAnyCorteExceedingLimit(): boolean {
+    return this.cortes.some(c => this.corteExceedsLimit(c));
   }
 }
+

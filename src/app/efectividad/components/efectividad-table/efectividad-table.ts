@@ -71,7 +71,7 @@ export class EfectividadTableComponent implements OnChanges {
  
     this.consolidatedActivities = Array.from(map.values()).map(item => ({
       ...item,
-      notes: item.notes.length ? item.notes.join(' | ') : '—'
+      notes: item.notes.length ? [...new Set(item.notes)].join(' | ') : '—'
     }));
   }
  
