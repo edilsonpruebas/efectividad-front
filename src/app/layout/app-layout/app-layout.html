@@ -11,56 +11,23 @@
 
     <nav class="sidebar-nav">
 
-      <!-- OPERACIONES — visible para todos -->
-      <div class="nav-section">
-        <span class="nav-section-label" *ngIf="sidebarOpen">Operaciones</span>
+      <ng-container *ngFor="let group of visibleGroups">
 
-        <a routerLink="/"
-           routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: true }"
-           class="nav-item">
-          <span class="nav-icon">🏭</span>
-          <span class="nav-label" *ngIf="sidebarOpen">Dashboard Actividades</span>
-        </a>
-      </div>
+        <div class="nav-section">
+          <span class="nav-section-label" *ngIf="sidebarOpen">{{ group.group }}</span>
 
-      <!-- REPORTES — solo ADMIN -->
-      <div class="nav-section" *ngIf="auth.isAdmin()">
-        <span class="nav-section-label" *ngIf="sidebarOpen">Reportes</span>
+          <a *ngFor="let item of group.items"
+             [routerLink]="item.route"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="item.route === '/' ? { exact: true } : {}"
+             class="nav-item">
+            <span class="nav-icon">{{ item.label.split(' ')[0] }}</span>
+            <span class="nav-label" *ngIf="sidebarOpen">{{ item.label.split(' ').slice(1).join(' ') }}</span>
+          </a>
 
-        <a routerLink="/reports/efectividad"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">📊</span>
-          <span class="nav-label" *ngIf="sidebarOpen">Efectividad</span>
-        </a>
+        </div>
 
-        <a routerLink="/reports/manual"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">📝</span>
-          <span class="nav-label" *ngIf="sidebarOpen">Reporte Manual</span>
-        </a>
-      </div>
-
-      <!-- ADMINISTRACIÓN — solo ADMIN -->
-      <div class="nav-section" *ngIf="auth.isAdmin()">
-        <span class="nav-section-label" *ngIf="sidebarOpen">Administración</span>
-
-        <a routerLink="/admin/efectividad"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🔧</span>
-          <span class="nav-label" *ngIf="sidebarOpen">Operadores y Procesos</span>
-        </a>
-
-        <a routerLink="/reports/history"
-      routerLinkActive="active"
-      class="nav-item">
-      <span class="nav-icon">🗂️</span>
-      <span class="nav-label" *ngIf="sidebarOpen">Historial Reportes</span>
-      </a>
-      </div>
+      </ng-container>
 
     </nav>
 

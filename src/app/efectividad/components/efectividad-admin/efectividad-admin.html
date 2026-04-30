@@ -1,7 +1,6 @@
 <div class="admin-panel">
   <h2 class="admin-title">Administración</h2>
 
-  <!-- TABS -->
   <div class="tabs">
     <button [class.active]="activeTab === 'operators'" (click)="activeTab = 'operators'; resetFilters()">
       👷 Operadores
@@ -25,6 +24,16 @@
       <button class="btn-save" (click)="submitOperator()">Guardar operador</button>
     </div>
 
+    <!-- FORMULARIO EDITAR OPERADOR -->
+    <div class="form-card form-card-edit" *ngIf="editingOperator">
+      <div class="form-card-edit-title">✏️ Editando: <strong>{{ editingOperator.name }}</strong></div>
+      <input placeholder="Nombre completo" [(ngModel)]="editOperatorForm.name" />
+      <div class="form-card-actions">
+        <button class="btn-save"        (click)="submitEditOperator()">✔ Guardar cambios</button>
+        <button class="btn-cancel-edit" (click)="cancelEditOperator()">✕ Cancelar</button>
+      </div>
+    </div>
+
     <div class="search-box" style="margin: 16px 0;">
       <input
         type="text"
@@ -35,7 +44,8 @@
     </div>
 
     <div class="item-list">
-      <div class="item-row" *ngFor="let op of paginatedOperators">
+      <div class="item-row" *ngFor="let op of paginatedOperators"
+           [class.item-row-editing]="editingOperator?.id === op.id">
         <div class="item-info">
           <span class="item-name">{{ op.name }}</span>
           <span class="item-sub">{{ op.email }}</span>
@@ -44,6 +54,7 @@
           <span class="badge" [ngClass]="op.is_active ? 'badge-active' : 'badge-inactive'">
             {{ op.is_active ? 'Activo' : 'Inactivo' }}
           </span>
+          <button class="btn-edit"   (click)="startEditOperator(op)">✏️ Editar</button>
           <button class="btn-toggle" (click)="toggleOperator.emit(op.id)">
             {{ op.is_active ? 'Desactivar' : 'Activar' }}
           </button>
@@ -55,23 +66,13 @@
     </div>
 
     <div class="pagination" *ngIf="totalOperatorPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
-      <button
-        (click)="prevPage()"
-        [disabled]="currentPage === 1"
+      <button (click)="prevPage()" [disabled]="currentPage === 1"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
-        [style.opacity]="currentPage === 1 ? '0.5' : '1'">
-        ← Anterior
-      </button>
-      <span style="font-size: 14px; color: #374151;">
-        Página {{ currentPage }} de {{ totalOperatorPages }}
-      </span>
-      <button
-        (click)="nextPage(totalOperatorPages)"
-        [disabled]="currentPage === totalOperatorPages"
+        [style.opacity]="currentPage === 1 ? '0.5' : '1'">← Anterior</button>
+      <span style="font-size: 14px; color: #374151;">Página {{ currentPage }} de {{ totalOperatorPages }}</span>
+      <button (click)="nextPage(totalOperatorPages)" [disabled]="currentPage === totalOperatorPages"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
-        [style.opacity]="currentPage === totalOperatorPages ? '0.5' : '1'">
-        Siguiente →
-      </button>
+        [style.opacity]="currentPage === totalOperatorPages ? '0.5' : '1'">Siguiente →</button>
     </div>
   </div>
 
@@ -84,7 +85,6 @@
       </button>
     </div>
 
-    <!-- FORMULARIO CREAR -->
     <div class="form-card" *ngIf="showProcessForm">
       <input placeholder="Nombre del proceso"     [(ngModel)]="newProcess.name" />
       <input placeholder="Descripción (opcional)" [(ngModel)]="newProcess.description" />
@@ -92,14 +92,13 @@
       <button class="btn-save" (click)="submitProcess()">Guardar proceso</button>
     </div>
 
-    <!-- FORMULARIO EDITAR -->
     <div class="form-card form-card-edit" *ngIf="editingProcess">
       <div class="form-card-edit-title">✏️ Editando: <strong>{{ editingProcess.name }}</strong></div>
       <input placeholder="Nombre del proceso"     [(ngModel)]="editProcessForm.name" />
       <input placeholder="Descripción (opcional)" [(ngModel)]="editProcessForm.description" />
       <input placeholder="Meta por hora"          [(ngModel)]="editProcessForm.base_per_hour" type="number" min="0" />
       <div class="form-card-actions">
-        <button class="btn-save"   (click)="submitEditProcess()">✔ Guardar cambios</button>
+        <button class="btn-save"        (click)="submitEditProcess()">✔ Guardar cambios</button>
         <button class="btn-cancel-edit" (click)="cancelEditProcess()">✕ Cancelar</button>
       </div>
     </div>
@@ -125,9 +124,7 @@
           <span class="badge" [ngClass]="pr.is_active ? 'badge-active' : 'badge-inactive'">
             {{ pr.is_active ? 'Activo' : 'Inactivo' }}
           </span>
-          <button class="btn-edit"   (click)="startEditProcess(pr)">
-            ✏️ Editar
-          </button>
+          <button class="btn-edit"   (click)="startEditProcess(pr)">✏️ Editar</button>
           <button class="btn-toggle" (click)="toggleProcess.emit(pr.id)">
             {{ pr.is_active ? 'Desactivar' : 'Activar' }}
           </button>
@@ -139,23 +136,13 @@
     </div>
 
     <div class="pagination" *ngIf="totalProcessPages > 1" style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; padding: 12px;">
-      <button
-        (click)="prevPage()"
-        [disabled]="currentPage === 1"
+      <button (click)="prevPage()" [disabled]="currentPage === 1"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
-        [style.opacity]="currentPage === 1 ? '0.5' : '1'">
-        ← Anterior
-      </button>
-      <span style="font-size: 14px; color: #374151;">
-        Página {{ currentPage }} de {{ totalProcessPages }}
-      </span>
-      <button
-        (click)="nextPage(totalProcessPages)"
-        [disabled]="currentPage === totalProcessPages"
+        [style.opacity]="currentPage === 1 ? '0.5' : '1'">← Anterior</button>
+      <span style="font-size: 14px; color: #374151;">Página {{ currentPage }} de {{ totalProcessPages }}</span>
+      <button (click)="nextPage(totalProcessPages)" [disabled]="currentPage === totalProcessPages"
         style="padding: 6px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer;"
-        [style.opacity]="currentPage === totalProcessPages ? '0.5' : '1'">
-        Siguiente →
-      </button>
+        [style.opacity]="currentPage === totalProcessPages ? '0.5' : '1'">Siguiente →</button>
     </div>
   </div>
 </div>

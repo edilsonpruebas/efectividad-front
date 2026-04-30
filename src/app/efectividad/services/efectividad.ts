@@ -5,7 +5,8 @@ import {
   BehaviorSubject, Subject, switchMap, takeUntil, tap, catchError, of,
   Observable
 } from 'rxjs';
-import { UpdateProcessDto } from '../pages/efectividad-admin-container/efectividad-admin-container';
+// 🔥 IMPORTANTE: Agregamos UpdateOperatorDto a la importación
+import { UpdateProcessDto, UpdateOperatorDto } from '../pages/efectividad-admin-container/efectividad-admin-container';
 
 export interface EfectividadFilter {
   date_from:   string | null;
@@ -107,6 +108,11 @@ export class EfectividadService {
     return this.http.delete<{ message: string }>(`${this.baseApi}/operators/${id}`);
   }
 
+  // 🔥 NUEVO: Método para actualizar el operador
+  updateOperator(id: number, dto: UpdateOperatorDto): Observable<any> {
+    return this.http.put(`${this.baseApi}/operators/${id}`, dto);
+  }
+
   getAllProcesses() {
     return this.http.get<any[]>(`${this.baseApi}/processes/all`);
   }
@@ -122,7 +128,8 @@ export class EfectividadService {
   deleteProcess(id: number) {
     return this.http.delete<{ message: string }>(`${this.baseApi}/processes/${id}`);
   }
+  
   updateProcess(id: number, dto: UpdateProcessDto): Observable<any> {
-  return this.http.put(`${this.baseApi}/processes/${id}`, dto);
-}
+    return this.http.put(`${this.baseApi}/processes/${id}`, dto);
+  }
 }

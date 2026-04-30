@@ -9,8 +9,11 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
-  role: 'ADMIN' | 'SUPERVISOR';
+  role: 'ADMIN' | 'SUPERVISOR' | 'RRHH' | 'FABRICA' | 'OPERACIONES' | 'VP';
+  permissions: string[];  // ← nuevo campo para permisos específicos
 }
+
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -94,6 +97,12 @@ export class AuthService {
 
   isSupervisor(): boolean {
     return this.getUser()?.role === 'SUPERVISOR';
+  }
+
+  can(permission: string): boolean {
+    const user = this.getUser();
+    if (!user) return false;
+    return user.permissions.includes('*') || user.permissions.includes(permission);
   }
 
   private loadUser(): AuthUser | null {

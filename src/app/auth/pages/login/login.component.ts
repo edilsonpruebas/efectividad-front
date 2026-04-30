@@ -27,11 +27,16 @@ export class LoginComponent {
 
     this.auth.login(this.email, this.password).subscribe({
       next: (res) => {
-        // Redirigir según rol
-        if (res.user.role === 'SUPERVISOR') {
-          this.router.navigate(['/']);        // solo dashboard actividades
+        const perms = res.user.permissions;
+
+        if (perms.includes('*') || perms.includes('dashboard.activities')) {
+          this.router.navigate(['/dashboard']);
+        } else if (perms.includes('reports.efectividad')) {
+          this.router.navigate(['/reports/efectividad']);
+        } else if (perms.includes('reports.manual')) {
+          this.router.navigate(['/reports/manual']);
         } else {
-          this.router.navigate(['/']);        // admin entra al dashboard general
+          this.router.navigate(['/login']);
         }
       },
       error: (err) => {

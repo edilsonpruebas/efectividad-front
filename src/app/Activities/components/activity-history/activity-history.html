@@ -1,35 +1,83 @@
 <div class="history-panel">
 
-  <h2>Historial de Actividades <span class="subtitle">— últimos 10 registros</span></h2>
+  <div class="history-header">
+    <div class="history-title">
+      <h2>🗂️ Historial de Actividades</h2>
+      <span class="subtitle" *ngIf="isSupervisor">— Solo tus registros</span>
+    </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Operador</th>
-        <th>Proceso</th>
-        <th>Inicio</th>
-        <th>Fin</th>
-        <th>Duración (min)</th>
-        <th>Cantidad</th>
-      </tr>
-    </thead>
+    <!-- FILTROS DE FECHA -->
+    <div class="filter-bar">
+      <button class="btn-filter"
+              [class.active]="isToday()"
+              (click)="setToday()">Hoy</button>
 
-    <tbody>
-      <tr *ngFor="let h of history">
-        <td>{{ h.operator }}</td>
-        <td>{{ h.process }}</td>
-        <td>{{ h.start_time | date:'short' }}</td>
-        <td>{{ h.end_time | date:'short' }}</td>
-        <td>{{ h.duration_minutes }}</td>
-        <td>{{ h.quantity ?? '—' }}</td>
-      </tr>
+      <button class="btn-filter"
+              [class.active]="isYesterday()"
+              (click)="setYesterday()">Ayer</button>
 
-      <tr *ngIf="history.length === 0">
-        <td colspan="6" style="text-align:center; color:#94a3b8; padding:20px;">
-          No hay registros aún.
-        </td>
-      </tr>
-    </tbody>
-  </table>
+      <input type="date"
+             class="date-input"
+             [(ngModel)]="selectedDate"
+             (ngModelChange)="onDateChange()" />
+
+      <button class="btn-filter btn-clear"
+              *ngIf="selectedDate"
+              (click)="clearFilter()">✕ Limpiar</button>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Operador</th>
+          <th>Proceso</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Duración (min)</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of paginatedHistory">
+          <td>{{ h.operator }}</td>
+          <td>{{ h.process }}</td>
+          <td>{{ h.start_time | date:'short' }}</td>
+          <td>{{ h.end_time | date:'short' }}</td>
+          <td>{{ h.duration_minutes }}</td>
+          <td>{{ h.quantity ?? '—' }}</td>
+        </tr>
+
+        <tr *ngIf="paginatedHistory.length === 0">
+          <td colspan="6" class="empty-row">
+            No hay registros{{ selectedDate ? ' para esta fecha' : '' }}.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINACIÓN -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="page-btn"
+            (click)="goToPage(page - 1)"
+            [disabled]="page === 1">‹ Anterior</button>
+
+    <button *ngFor="let n of pageNumbers"
+            class="page-btn"
+            [class.current]="n === page"
+            (click)="goToPage(n)">{{ n }}</button>
+
+    <button class="page-btn"
+            (click)="goToPage(page + 1)"
+            [disabled]="page === totalPages">Siguiente ›</button>
+
+    <span class="page-info">
+      Página {{ page }} de {{ totalPages }}
+      ({{ filteredHistory.length }} registros)
+    </span>
+  </div>
 
 </div>

@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  Operator, Process, CreateOperatorDto, CreateProcessDto, UpdateProcessDto
+  Operator, Process, CreateOperatorDto, CreateProcessDto, UpdateProcessDto, UpdateOperatorDto
 } from '../../pages/efectividad-admin-container/efectividad-admin-container';
 
 @Component({
@@ -21,6 +21,7 @@ export class EfectividadAdminComponent {
   @Output() createOperator = new EventEmitter<CreateOperatorDto>();
   @Output() toggleOperator = new EventEmitter<number>();
   @Output() deleteOperator = new EventEmitter<number>();
+  @Output() updateOperator = new EventEmitter<{ id: number; dto: UpdateOperatorDto }>();
   @Output() createProcess  = new EventEmitter<CreateProcessDto>();
   @Output() toggleProcess  = new EventEmitter<number>();
   @Output() deleteProcess  = new EventEmitter<number>();
@@ -30,6 +31,9 @@ export class EfectividadAdminComponent {
 
   newOperator: CreateOperatorDto = { name: '' };
   showOperatorForm               = false;
+
+  editingOperator: Operator | null  = null;
+  editOperatorForm: UpdateOperatorDto = { name: '' };
 
   newProcess: CreateProcessDto = { name: '', description: '', base_per_hour: 0 };
   showProcessForm               = false;
@@ -74,13 +78,8 @@ export class EfectividadAdminComponent {
     return Math.ceil(this.filteredProcesses.length / this.itemsPerPage) || 1;
   }
 
-  prevPage() {
-    if (this.currentPage > 1) this.currentPage--;
-  }
-
-  nextPage(totalPages: number) {
-    if (this.currentPage < totalPages) this.currentPage++;
-  }
+  prevPage() { if (this.currentPage > 1) this.currentPage--; }
+  nextPage(totalPages: number) { if (this.currentPage < totalPages) this.currentPage++; }
 
   resetFilters() {
     this.searchQuery = '';
@@ -92,6 +91,23 @@ export class EfectividadAdminComponent {
     this.createOperator.emit({ name: this.newOperator.name });
     this.newOperator = { name: '' };
     this.showOperatorForm = false;
+  }
+
+  startEditOperator(op: Operator) {
+    this.editingOperator = op;
+    this.editOperatorForm = { name: op.name };
+  }
+
+  cancelEditOperator() {
+    this.editingOperator = null;
+    this.editOperatorForm = { name: '' };
+  }
+
+  submitEditOperator() {
+    if (!this.editingOperator || !this.editOperatorForm.name) return;
+    this.updateOperator.emit({ id: this.editingOperator.id, dto: { ...this.editOperatorForm } });
+    this.editingOperator = null;
+    this.editOperatorForm = { name: '' };
   }
 
   submitProcess() {

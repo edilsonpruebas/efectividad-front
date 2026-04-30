@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { EfectividadAdminComponent } from '../../components/efectividad-admin/efectividad-admin';
 import { EfectividadService } from '../../services/efectividad';
@@ -35,6 +35,10 @@ export interface UpdateProcessDto {
   base_per_hour?: number;
 }
 
+export interface UpdateOperatorDto {
+  name?: string;
+}
+
 @Component({
   selector: 'app-efectividad-admin-container',
   standalone: true,
@@ -47,6 +51,7 @@ export interface UpdateProcessDto {
       (createOperator)="onCreateOperator($event)"
       (toggleOperator)="onToggleOperator($event)"
       (deleteOperator)="onDeleteOperator($event)"
+      (updateOperator)="onUpdateOperator($event)"
       (createProcess)="onCreateProcess($event)"
       (toggleProcess)="onToggleProcess($event)"
       (deleteProcess)="onDeleteProcess($event)"
@@ -62,7 +67,10 @@ export class EfectividadAdminContainerComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private service: EfectividadService) {}
+  constructor(
+    private service: EfectividadService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.loadOperators();
@@ -72,13 +80,23 @@ export class EfectividadAdminContainerComponent implements OnInit, OnDestroy {
   loadOperators() {
     this.service.getAllOperators()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({ next: d => this.operators = d });
+      .subscribe({ 
+        next: d => {
+          this.operators = d;
+          this.cdr.markForCheck();
+        } 
+      });
   }
 
   loadProcesses() {
     this.service.getAllProcesses()
       .pipe(takeUntil(this.destroy$))
-      .subscribe({ next: d => this.processes = d });
+      .subscribe({ 
+        next: d => {
+          this.processes = d;
+          this.cdr.markForCheck();
+        } 
+      });
   }
 
   onCreateOperator(dto: CreateOperatorDto) {
@@ -102,6 +120,15 @@ export class EfectividadAdminContainerComponent implements OnInit, OnDestroy {
       .subscribe({
         next:  () => this.loadOperators(),
         error: e  => alert(e?.error?.message ?? 'Error al eliminar operador')
+      });
+  }
+
+  onUpdateOperator(payload: { id: number; dto: UpdateOperatorDto }) {
+    this.service.updateOperator(payload.id, payload.dto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next:  () => this.loadOperators(),
+        error: (e: HttpErrorResponse) => alert(e?.error?.message ?? 'Error al actualizar operador')
       });
   }
 
