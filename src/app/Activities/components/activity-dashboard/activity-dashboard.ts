@@ -1,12 +1,13 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { DatePipe } from '@angular/common';
+
 
 @Component({
   selector: 'app-activity-dashboard',
   standalone: true,
-  imports: [FormsModule, NgFor, DatePipe, NgIf],
+  imports: [FormsModule, NgFor, DatePipe, NgIf, NgClass],
   templateUrl: './activity-dashboard.html',
   styleUrls: ['./activity-dashboard.css']
 })
@@ -49,6 +50,10 @@ export class ActivityDashboardComponent {
   processLabel: string   = 'Seleccionar proceso...';
 
   selectedGroupOperators: any[] = [];
+
+  // Pagination
+  pageSize = 3;
+  currentActivityPage = 0;
 
   // ── FILTROS ──────────────────────────────────────────────────────────
 
@@ -184,4 +189,42 @@ export class ActivityDashboardComponent {
   groupOperatorNames(group: any): string {
     return group.activities?.map((a: any) => a.operator?.name).join(', ') ?? '—';
   }
+
+  // Paginación de cards (individuales + grupales)
+  get allActiveCards(): any[] {
+    // Puedes elegir el orden que prefieras. Este es individuales primero, luego grupales.
+    // Si quieres mezclarlos de otro modo (por fecha, por ejemplo) ajusta aquí.
+    return [...this.activities, ...this.activeGroups];
+  }
+
+  get maxActivityPage(): number {
+    return Math.ceil(this.allActiveCards.length / this.pageSize) - 1;
+  }
+
+  get displayedCards(): any[] {
+    const start = this.currentActivityPage * this.pageSize;
+    return this.allActiveCards.slice(start, start + this.pageSize);
+  }
+
+      nextActivityPage() {
+        if (this.currentActivityPage < this.maxActivityPage) {
+          this.currentActivityPage++;
+        }
+      }
+
+      prevActivityPage() {
+        if (this.currentActivityPage > 0) {
+          this.currentActivityPage--;
+        }
+      }
+
+      resetActivityPage() {
+        this.currentActivityPage = 0;
+      }
+
+      ngOnChanges(changes: SimpleChanges) {
+      if (changes['activities'] || changes['activeGroups']) {
+        this.resetActivityPage();
+      }
+    }
 }

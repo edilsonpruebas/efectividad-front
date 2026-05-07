@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivityService } from '../../services/activity';
+import { NotificationService } from '../../../auth/services/notification.service'; // ← AGREGAR
 import { ActivityStartComponent } from "../../components/activity-start/activity-start";
 
 @Component({
@@ -11,12 +12,17 @@ import { ActivityStartComponent } from "../../components/activity-start/activity
 })
 export class ActivityStartContainerComponent {
 
-  constructor(private service: ActivityService) {}
+  constructor(
+    private service: ActivityService,
+    private notificationService: NotificationService // ← AGREGAR
+  ) {}
 
   start(data: any) {
     this.service.start(data).subscribe({
-      next: () => alert('Actividad iniciada'),
-      error: err => alert(err.error.error)
+      next: () => {
+        this.notificationService.success('✓ Actividad iniciada correctamente'); // ← AGREGAR
+      },
+      error: err => {}
     });
   }
 }

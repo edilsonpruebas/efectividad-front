@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivityListComponent } from '../../components/activity-list/activity-list';
 import { ActivityStopComponent } from '../../components/activity-stop/activity-stop';
 import { ActivityService } from '../../services/activity';
+import { NotificationService } from '../../../auth/services/notification.service'; // ← AGREGAR
 
 @Component({
   selector: 'app-activity-list-container',
@@ -27,7 +28,10 @@ export class ActivityListContainerComponent implements OnInit {
   activities: any[] = [];
   selected: any = null;
 
-  constructor(private service: ActivityService) {}
+  constructor(
+    private service: ActivityService,
+    private notificationService: NotificationService // ← AGREGAR
+  ) {}
 
   ngOnInit() {
     this.service.activities$.subscribe((data: any[]) => {
@@ -44,11 +48,11 @@ export class ActivityListContainerComponent implements OnInit {
     this.service.stop(this.selected.id, { quantity: data.quantity })
       .subscribe({
         next: () => {
-          alert('Finalizada');
+          this.notificationService.success('✓ Actividad finalizada'); // ← AGREGAR
           this.selected = null;
           this.service.reload();
         },
-        error: err => console.error('❌ Error al finalizar:', err)
+        error: err => {}
       });
   }
 }

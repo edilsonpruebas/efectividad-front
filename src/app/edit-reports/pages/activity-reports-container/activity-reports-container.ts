@@ -108,7 +108,6 @@ export class ActivityReportsContainerComponent implements OnInit {
     call$.subscribe({
       next: () => {
         this.saving     = false;
-        this.successMsg = 'Reporte editado correctamente';
         this.cdr.detectChanges(); // ←
         setTimeout(() => {
           this.successMsg = null;

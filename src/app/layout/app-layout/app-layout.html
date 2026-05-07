@@ -1,13 +1,22 @@
+<app-notification-display></app-notification-display> <!-- ← AGREGAR AL INICIO -->
+
 <div class="app-shell" [class.collapsed]="!sidebarOpen">
 
   <aside class="sidebar">
 
     <div class="sidebar-header">
-      <span class="logo" *ngIf="sidebarOpen">⚙️ Módulo Efectividad</span>
-      <button class="toggle-btn" (click)="toggle()">
-        {{ sidebarOpen ? '◀' : '▶' }}
-      </button>
-    </div>
+  <!-- Reemplazamos el span por la imagen con la condición de sidebar abierto -->
+  <img 
+    *ngIf="sidebarOpen" 
+    src="logo.png" 
+    alt="Logo CMV" 
+    class="sidebar-logo"
+  >
+  
+  <button class="toggle-btn" (click)="toggle()">
+    {{ sidebarOpen ? '◀' : '▶' }}
+  </button>
+</div>
 
     <nav class="sidebar-nav">
 
@@ -33,10 +42,9 @@
 
     <!-- FOOTER con usuario y logout -->
     <div class="sidebar-footer" *ngIf="sidebarOpen">
-      <span class="sidebar-user">{{ auth.getUser()?.name }}</span>
-      <span class="sidebar-role">{{ auth.getUser()?.role }}</span>
-      <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
-    </div>
+  <span class="sidebar-user-role">{{ auth.getUser()?.name }} - {{ auth.getUser()?.role }}</span>
+  <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+</div>
 
   </aside>
 

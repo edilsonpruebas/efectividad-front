@@ -49,7 +49,6 @@ body {
   position: sticky;
   top: 16px;
   height: fit-content;
-
   overflow: visible; /* 🔥 FIX PRINCIPAL */
   z-index: 1;
 }
@@ -161,7 +160,12 @@ input[type="number"] {
 /* ===== DROPDOWN FIX FINAL ===== */
 .searchable-dropdown {
   position: relative;
-  z-index: 999;
+  z-index: 10; /* Bajamos el nivel base */
+}
+
+/* 🔥 Elevamos el padre COMPLETO solo cuando se abre */
+.searchable-dropdown.active {
+  z-index: 9999;
 }
 
 .dropdown-trigger {
@@ -179,13 +183,11 @@ input[type="number"] {
   top: 110%;
   left: 0;
   width: 100%;
-
   background: white;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-
-  z-index: 99999; /* 🔥 SUPERIOR A TODO */
+  z-index: 100; /* Nivel superior razonable para el panel */
 }
 
 .dropdown-panel input {
@@ -210,7 +212,35 @@ input[type="number"] {
   background: #f0f4ff;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== SECCIÓN DE PAGINACIÓN CORREGIDA ===== */
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0; /* Línea divisoria muy sutil */
+}
+
+/* Modificadores para hacer los botones de paginación pequeños y alineados */
+.pagination-buttons .btn {
+  width: auto;             /* Quita el ancho del 100% */
+  padding: 8px 16px;       /* Botones mucho más compactos */
+  margin-top: 0;           /* Quita el margen superior */
+  font-size: 13px;         /* Tamaño de fuente ideal */
+  border-radius: 8px;      /* Bordes ligeramente más finos */
+}
+
+.page-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  min-width: 110px;        /* Evita saltos visuales al cambiar de página */
+  text-align: center;
+  user-select: none;
+}
+
 @media (max-width: 1024px) {
   .dashboard {
     flex-direction: column;
@@ -219,37 +249,19 @@ input[type="number"] {
   .start-panel {
     width: 100%;
     position: relative;
+    z-index: 10; /* <-- Aumenta el stacking context del panel selector */
+    overflow: visible !important; /* <-- Asegura que los dropdowns se vean fuera del panel */
+  }
+
+  /* Muy importante: baja el z-index del panel derecho para que los dropdowns se vean por encima */
+  .list-panel {
+    width: 100%;
+    position: relative;
+    z-index: 0 !important;
   }
 }
 
-/* ===== FIX DROPDOWN (SIN ROMPER DISEÑO) ===== */
-
-/* Permitir que el dropdown salga del panel SIN afectar layout */
-.start-panel {
-  overflow: visible !important;
-}
-
-/* Cada dropdown maneja su propio contexto */
-.searchable-dropdown {
-  position: relative;
-  z-index: 1;
-}
-
-/* 🔥 El dropdown activo se pone por encima */
-.searchable-dropdown.active {
-  z-index: 9999;
-}
-
-/* Panel desplegable */
-.dropdown-panel {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 10000;
-}
-
 /* ===== BOTONES (ANIMACIONES RESTAURADAS) ===== */
-
 .btn {
   position: relative;
   overflow: hidden;
@@ -315,7 +327,6 @@ input[type="number"] {
 }
 
 /* ===== TEXTO EN TARJETAS (ACTIVIDADES EN PROCESO) ===== */
-
 .card-info .name {
   font-size: 16px;
   font-weight: 700;
@@ -375,7 +386,6 @@ input[type="number"] {
 }
 
 /* ===== BOTONES DE ACCIÓN EN CARDS ===== */
-
 .action-buttons {
   display: flex;
   flex-direction: column;
@@ -408,7 +418,6 @@ input[type="number"] {
 }
 
 /* ===== CARD ACTIONS VERTICAL ===== */
-
 .card-actions {
   display: flex;
   flex-direction: column;
@@ -449,7 +458,6 @@ input[type="number"] {
 }
 
 /* ===== BADGE DE ESTADO ===== */
-
 .status-badge {
   display: inline-block;
   font-size: 11px;
@@ -471,13 +479,11 @@ input[type="number"] {
 }
 
 /* ===== DURACIÓN DETENIDA ===== */
-
 .duration.stopped {
   color: #ca8a04;
 }
 
 /* ===== CARD FORM COMPACTO ===== */
-
 .card-form {
   display: flex;
   flex-direction: column;

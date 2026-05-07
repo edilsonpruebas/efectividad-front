@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivityDashboardComponent } from '../../components/activity-dashboard/activity-dashboard';
 import { ActivityService } from '../../services/activity';
+import { NotificationService } from '../../../auth/services/notification.service'; // ← AGREGAR
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -29,15 +30,16 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
 
-  activities:   any[] = [];
+  activities: any[] = [];
   activeGroups: any[] = [];
-  operators:    any[] = [];
-  processes:    any[] = [];
+  operators: any[] = [];
+  processes: any[] = [];
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private service: ActivityService,
+    private notificationService: NotificationService, // ← AGREGAR
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -46,14 +48,14 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => { this.operators = data; this.cdr.markForCheck(); },
-        error: (err) => console.error(err)
+        error: (err) => this.notificationService.error('Error al cargar operadores') // ← USAR
       });
 
     this.service.getProcesses()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => { this.processes = data; this.cdr.markForCheck(); },
-        error: (err) => console.error(err)
+        error: (err) => this.notificationService.error('Error al cargar procesos') // ← USAR
       });
 
     this.service.activities$
@@ -72,7 +74,7 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => { this.activeGroups = data; this.cdr.markForCheck(); },
-        error: (err) => console.error(err)
+        error: (err) => this.notificationService.error('Error al cargar grupos') // ← USAR
       });
   }
 
@@ -80,8 +82,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.start(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.service.reload(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.service.reload(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {} // El interceptor muestra el error
       });
   }
 
@@ -94,7 +99,7 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
           this.service.reload();
           this.cdr.markForCheck();
         },
-        error: err => console.error(err)
+        error: err => {}
       });
   }
 
@@ -102,8 +107,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.stopTimer(data.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.service.reload(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.service.reload(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -111,8 +119,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.submitReport(data.id, { quantity: data.quantity, notes: data.notes })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.service.reload(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.service.reload(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -120,8 +131,12 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.quickReport(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.service.reload(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          
+          this.service.reload(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -129,8 +144,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.cancel(data.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.service.reload(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.service.reload(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -138,8 +156,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.startGroup(data)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.loadGroups(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.loadGroups(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -147,8 +168,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.stopTimerGroup(data.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.loadGroups(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.loadGroups(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -156,8 +180,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.submitReportGroup(data.id, { quantity: data.quantity, notes: data.notes })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.loadGroups(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.loadGroups(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 
@@ -165,8 +192,11 @@ export class ActivityDashboardContainerComponent implements OnInit, OnDestroy {
     this.service.cancelGroup(data.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.loadGroups(); this.cdr.markForCheck(); },
-        error: err => console.error(err)
+        next: () => { 
+          this.loadGroups(); 
+          this.cdr.markForCheck(); 
+        },
+        error: err => {}
       });
   }
 

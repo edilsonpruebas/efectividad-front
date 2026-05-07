@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
 import { AuthService } from '../../auth/services/auth.service';
+import { NotificationDisplayComponent } from '../../shared/components/notification-Display/Notification-Display.Component'; // ← AQUÍ
 
 interface MenuItem {
   label: string;
@@ -17,7 +18,14 @@ interface MenuGroup {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, NgFor],
+  imports: [
+    RouterOutlet, 
+    RouterLink, 
+    RouterLinkActive, 
+    NgIf, 
+    NgFor,
+    NotificationDisplayComponent // ← AQUÍ
+  ],
   templateUrl: './app-layout.html',
   styleUrls: ['./app-layout.css']
 })
